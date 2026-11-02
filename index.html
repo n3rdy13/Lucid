@@ -1,0 +1,1399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lucid">
+<meta name="theme-color" content="#0b0c17">
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" id="touchicon" href="">
+<link rel="icon" id="favicon" href="">
+<title>Lucid</title>
+<style>
+:root{--bg:#0b0c17;--bg2:#10121f;--panel:#151830;--panel2:#1d2140;--line:#272b4d;--text:#ebeaf7;--muted:#9a9dc0;--accent:#a78bfa;--accent2:#f472b6;--q:#f6c97f;--act:#b9b6dc;--danger:#f87171;--user:#2a2350;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+#app{position:fixed;left:0;right:0;top:var(--app-top,0);height:var(--app-h,100dvh);display:flex;flex-direction:column;max-width:900px;margin:0 auto}
+#top{display:flex;align-items:center;gap:4px;padding:calc(env(safe-area-inset-top) + 6px) 8px 8px 12px;border-bottom:1px solid var(--line);background:rgba(11,12,23,.95);min-height:52px}
+#top h1{flex:1;font-size:18px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#top .acts{display:flex;gap:4px;align-items:center}
+#view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 28px}
+#view.chatview{padding:0;display:flex;flex-direction:column;overflow:hidden}
+#nav{display:flex;border-top:1px solid var(--line);background:var(--bg2);padding-bottom:env(safe-area-inset-bottom)}
+#nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;color:var(--muted);text-decoration:none;font-size:11px}
+#nav a.on{color:var(--accent)}
+body.nonav #nav{display:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#170f2b;border:0;border-radius:999px;padding:10px 18px;font-weight:650}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:6px 14px;font-size:14px}
+.btn.danger{background:transparent;border:1px solid rgba(248,113,113,.5);color:var(--danger)}
+.btn.full{width:100%;margin:6px 0}
+.btn:disabled{opacity:.5}
+.icon{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;border-radius:50%;color:var(--text)}
+.icon:active{background:var(--panel2)}
+input,textarea,select,.pick{width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:11px 12px;font:16px/1.4 inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--accent)}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;margin:0}
+.pick{text-align:left}
+textarea{resize:vertical}
+.fld{display:block;margin-bottom:16px}
+.fld>span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.fld small,small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.form{max-width:640px;margin:0 auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inrow{display:flex;gap:8px;align-items:center}
+.inrow label{display:flex;gap:6px;align-items:center}
+.section{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:16px}
+.section h2{font-size:16px;margin:0 0 12px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer}
+.cardimg{aspect-ratio:3/4;background:var(--panel2)}
+.cardimg img{width:100%;height:100%;object-fit:cover;display:block}
+.card.wide .cardimg{aspect-ratio:16/9}
+.cardbody{padding:9px 11px 11px}
+.ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3b2f6e,#6b2f5e);color:#fff;font-weight:700}
+.ph.big{width:100%;height:100%;font-size:48px}
+.av{border-radius:50%;object-fit:cover;flex-shrink:0}
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;cursor:pointer}
+.row:active{background:var(--panel)}
+.rowmain{flex:1;min-width:0}
+.rowtop{display:flex;justify-content:space-between;gap:8px}
+.muted{color:var(--muted)}.sm{font-size:13px}.center{text-align:center}.pad{padding:30px 10px}
+.clamp1,.clamp2{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}.clamp1{-webkit-line-clamp:1}.clamp2{-webkit-line-clamp:2}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);margin:2px 2px 0 0}
+.search{margin-bottom:12px}
+.banner{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;margin-bottom:14px;border:1px solid var(--accent);background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(244,114,182,.10));cursor:pointer}
+.empty{text-align:center;padding:48px 16px}
+.empty h2{margin:6px 0}
+.emptyart{font-size:42px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.empty .btns{justify-content:center}
+.avpick{display:flex;flex-direction:column;align-items:center;gap:6px;margin:4px 0 18px;cursor:pointer}
+.coverpick{aspect-ratio:16/9;border:1px dashed var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:16px;cursor:pointer;background:var(--panel)}
+.coverpick img{width:100%;height:100%;object-fit:cover}
+.greet{display:flex;gap:6px;align-items:flex-start;margin-bottom:8px}
+.pickrow{display:flex;gap:10px;align-items:center;padding:8px 4px;cursor:pointer}
+.entry{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px}
+.entry input,.entry textarea{background:var(--bg2)}
+.msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 10px 6px}
+.msg{display:flex;gap:9px;margin-bottom:16px;align-items:flex-start}
+.msg.user{flex-direction:row-reverse}
+.bub{max-width:84%;background:var(--panel);border-radius:16px;padding:9px 13px 7px;min-width:60px}
+.msg.user .bub{background:var(--user)}
+.mname{font-size:12px;color:var(--muted);font-weight:650;margin-bottom:2px}
+.mtext{overflow-wrap:anywhere}
+.mtext em{color:var(--act)}
+.mtext .q{color:var(--q)}
+.mtools{display:none;gap:2px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.msg.sel .mtools,.msg:last-child .mtools{display:flex}
+.mtools button{border:0;background:transparent;color:var(--muted);padding:5px 7px;border-radius:8px;display:inline-flex}
+.mtools button:active{background:var(--panel2)}
+.mtools button:disabled{opacity:.3}
+.caret{display:inline-block;width:7px;height:1em;background:var(--accent);margin-left:2px;vertical-align:-2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.speakers{display:flex;gap:6px;overflow-x:auto;padding:6px 10px;align-items:center;border-top:1px solid var(--line);flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 5px;background:var(--panel);white-space:nowrap;font-size:13px}
+.chip.on{border-color:var(--accent);background:rgba(167,139,250,.18)}
+.composer{display:flex;gap:8px;align-items:flex-end;padding:8px 10px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg2);flex-shrink:0}
+.composer textarea{border-radius:20px;resize:none;max-height:160px;padding:10px 14px}
+.send{width:44px;height:44px;border-radius:50%;border:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#170f2b}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;z-index:20}
+#modal.open{display:flex}
+.sheet{background:var(--bg2);width:100%;max-width:640px;margin:0 auto;max-height:88%;overflow-y:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));border-top:1px solid var(--line);animation:up .18s ease-out}
+.sheet h3{margin:0 0 10px;font-size:18px}
+@keyframes up{from{transform:translateY(30px);opacity:.6}}
+.sheethead{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.mrow{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:7px}
+.mrow.danger{color:var(--danger)}
+.mlist{margin-top:8px}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#2b2f55;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px}
+.clipbtn{position:relative;height:44px;width:40px}
+.badge{position:absolute;top:4px;right:2px;min-width:17px;height:17px;border-radius:9px;background:var(--accent2);color:#170f2b;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+select{appearance:none;-webkit-appearance:none}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="top"></header>
+  <main id="view"></main>
+  <nav id="nav"></nav>
+</div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+'use strict';
+/* ================= Utilities ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const now = () => Date.now();
+const est = s => Math.ceil(String(s || '').length / 3.5);
+const splitTags = s => String(s || '').split(',').map(t => t.trim()).filter(Boolean);
+
+const IC = {
+  chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  users:'<circle cx="9" cy="8" r="4"/><path d="M1 21v-1a7 7 0 0 1 14 0v1"/><path d="M16 4a4 4 0 0 1 0 8M23 21v-1a7 7 0 0 0-5-6.7"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
+  gear:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  back:'<path d="M15 18l-6-6 6-6"/>',
+  left:'<path d="M15 18l-6-6 6-6"/>',
+  right:'<path d="M9 18l6-6-6-6"/>',
+  send:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  more:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  branch:'<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  bookmark:'<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+  cont:'<path d="M5 12h14M12 5l7 7-7 7"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+  clip:'<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+  spark:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'
+};
+const ic = (n, s = 20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</svg>`;
+
+function avatar(src, name, size = 44) {
+  const st = `width:${size}px;height:${size}px`;
+  if (src) return `<img class="av" style="${st}" src="${src}" alt="">`;
+  const ch = (String(name || '?').trim()[0] || '?').toUpperCase();
+  return `<div class="av ph" style="${st};font-size:${Math.round(size * .42)}px">${esc(ch)}</div>`;
+}
+function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms); }
+function modal(html) { const m = $('#modal'); m.innerHTML = `<div class="sheet">${html}</div>`; m.classList.add('open'); m.onclick = e => { if (e.target === m) closeModal(); }; }
+function closeModal() { const m = $('#modal'); m.classList.remove('open'); m.innerHTML = ''; }
+function ago(t) { const s = (now() - t) / 1000; if (s < 60) return 'now'; if (s < 3600) return Math.floor(s / 60) + 'm'; if (s < 86400) return Math.floor(s / 3600) + 'h'; if (s < 604800) return Math.floor(s / 86400) + 'd'; return new Date(t).toLocaleDateString(); }
+function empty(t, s, btns = '') { return `<div class="empty"><div class="emptyart">✦</div><h2>${t}</h2><p class="muted">${s}</p><div class="btns">${btns}</div></div>`; }
+function autoGrow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; }
+function pickFile(accept) { return new Promise(res => { const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.onchange = () => res(i.files[0] || null); i.click(); }); }
+function fileToDataURL(f) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); }); }
+async function resizeImage(src, max = 512) {
+  const img = new Image(); img.src = src; await img.decode();
+  const sc = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', .86);
+}
+function download(name, text, type = 'application/json') {
+  const b = new Blob([text], { type }); const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name.replace(/[\\/:*?"<>|]/g, '_');
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+}
+
+/* ================= Storage (IndexedDB, on-device) ================= */
+const STORES = ['characters', 'stories', 'personas', 'worlds', 'chats', 'instructions', 'kv'];
+let _db;
+function openDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('lucid', 2);
+    r.onupgradeneeded = () => { const db = r.result; STORES.forEach(s => { if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath: 'id' }); }); };
+    r.onsuccess = () => { _db = r.result; res(_db); }; r.onerror = () => rej(r.error);
+  });
+}
+function req(store, mode, fn) {
+  return new Promise((res, rej) => { const t = _db.transaction(store, mode); const r = fn(t.objectStore(store)); t.oncomplete = () => res(r ? r.result : undefined); t.onerror = t.onabort = () => rej(t.error); });
+}
+const DB = {
+  all: s => req(s, 'readonly', st => st.getAll()),
+  get: (s, id) => req(s, 'readonly', st => st.get(id)),
+  put: (s, o) => req(s, 'readwrite', st => st.put(o)),
+  del: (s, id) => req(s, 'readwrite', st => st.delete(id)),
+  clear: s => req(s, 'readwrite', st => st.clear())
+};
+const DATA_STORES = ['characters', 'stories', 'personas', 'worlds', 'chats', 'instructions'];
+const S = { characters: {}, stories: {}, personas: {}, worlds: {}, chats: {}, instructions: {}, settings: {} };
+
+const DEFAULT_SYSTEM = `You are {{char}} in an ongoing, immersive roleplay with {{user}}.
+- Stay in character at all times. Write {{char}}'s dialogue, actions and inner thoughts in vivid prose.
+- Never write {{user}}'s dialogue, actions or decisions; leave room for {{user}} to respond.
+- Use *asterisks* for actions and "quotes" for dialogue.
+- Keep continuity with the memory, lore and earlier messages.`;
+const DEFAULT_NARRATOR = `You are the narrator of an immersive interactive story with {{user}}.
+- Describe the world, atmosphere and events in vivid prose, and voice any cast characters the scene needs.
+- Never write {{user}}'s dialogue, actions or decisions; end at a point where {{user}} can respond.
+- Use *asterisks* for actions and "quotes" for dialogue.
+- Keep continuity with the memory, lore and earlier events.`;
+const ADULT_RULE = 'Every character in this story is an adult aged 18 or older.';
+
+function defaultSettings() { return { apiKey: '', model: '', temperature: 0.9, maxTokens: 600, contextTokens: 16000, systemTemplate: DEFAULT_SYSTEM, narratorTemplate: DEFAULT_NARRATOR, defaultPersonaId: null, builderModel: '', models: [], modelsFetched: 0 }; }
+async function loadAll() {
+  for (const s of DATA_STORES) (await DB.all(s)).forEach(o => S[s][o.id] = o);
+  const kv = await DB.get('kv', 'settings');
+  S.settings = Object.assign(defaultSettings(), kv?.value || {});
+}
+async function save(store, o) { o.updatedAt = now(); S[store][o.id] = o; await DB.put(store, o); }
+async function remove(store, id) { delete S[store][id]; await DB.del(store, id); }
+async function saveSettings() { await DB.put('kv', { id: 'settings', value: S.settings }); }
+function setS(k, v) { S.settings[k] = v; saveSettings(); }
+
+function newCharacter() { return { id: uid(), name: '', age: '', tagline: '', description: '', personality: '', scenario: '', greetings: [''], examples: '', systemPrompt: '', postHistory: '', tags: [], worldIds: [], instrIds: [], avatar: '', createdAt: now() }; }
+function newStory() { return { id: uid(), title: '', cover: '', premise: '', opening: '', characterIds: [], narrator: true, narratorNotes: '', worldIds: [], instrIds: [], tags: [], createdAt: now() }; }
+function newInstr() { return { id: uid(), name: '', content: '', enabled: true, scope: 'attached', models: '', position: 'top', createdAt: now() }; }
+function newPersona() { return { id: uid(), name: '', description: '', avatar: '', createdAt: now() }; }
+function newEntry() { return { id: uid(), keys: '', content: '', enabled: true, constant: false }; }
+function newWorld() { return { id: uid(), name: '', entries: [newEntry()], createdAt: now() }; }
+const isAdult = c => Number(c?.age) >= 18;
+
+/* ================= Router & shell ================= */
+let draft = null;
+function go(h) { if (location.hash === h) render(); else location.hash = h; }
+function edit(h) { draft = null; closeModal(); go(h); }
+function cancelEdit(h) { draft = null; go(h); }
+function route() { const [a, b] = (location.hash.slice(2) || 'chats').split('/'); return { a, b }; }
+function render() {
+  closeModal();
+  const { a, b } = route();
+  const views = { chats: viewChats, characters: viewCharacters, char: viewCharEdit, stories: viewStories, story: viewStoryEdit, worlds: viewWorlds, world: viewWorldEdit, settings: viewSettings, persona: viewPersonaEdit, chat: viewChat, instr: viewInstrEdit };
+  (views[a] || viewChats)(b);
+  const map = { char: 'characters', story: 'stories', world: 'worlds', persona: 'settings', instr: 'settings', chat: 'chats' };
+  const cur = map[a] || a;
+  $$('#nav a').forEach(x => x.classList.toggle('on', x.dataset.n === cur));
+}
+function shell({ title, back, actions = '', body, nav = true, cls = '' }) {
+  $('#top').innerHTML = `${back ? `<button class="icon" onclick="${back}" aria-label="Back">${ic('back', 22)}</button>` : ''}<h1>${esc(title)}</h1><div class="acts">${actions}</div>`;
+  const v = $('#view'); v.className = cls; v.innerHTML = body; v.scrollTop = 0;
+  document.body.classList.toggle('nonav', !nav);
+}
+function buildNav() {
+  const items = [['chats', 'chat', 'Chats'], ['characters', 'users', 'Characters'], ['stories', 'book', 'Stories'], ['worlds', 'globe', 'Worlds'], ['settings', 'gear', 'Settings']];
+  $('#nav').innerHTML = items.map(([n, i, l]) => `<a data-n="${n}" href="#/${n}" onclick="draft=null">${ic(i, 22)}<span>${l}</span></a>`).join('');
+}
+
+/* ================= Form helpers ================= */
+function field(label, key, val, o = {}) {
+  return `<label class="fld"><span>${label}${o.req ? ' *' : ''}</span><input data-k="${key}" type="${o.type || 'text'}" value="${esc(val ?? '')}" placeholder="${esc(o.ph || '')}" ${o.type === 'number' ? 'inputmode="numeric"' : ''}>${o.hint ? `<small>${o.hint}</small>` : ''}</label>`;
+}
+function area(label, key, val, o = {}) {
+  return `<label class="fld"><span>${label}</span><textarea data-k="${key}" rows="${o.rows || 4}" placeholder="${esc(o.ph || '')}">${esc(val ?? '')}</textarea>${o.hint ? `<small>${o.hint}</small>` : ''}</label>`;
+}
+function readForm(d) {
+  $$('#view [data-k]').forEach(el => {
+    if (el.type === 'radio') { if (el.checked) d[el.dataset.k] = el.value; }
+    else if (el.type === 'checkbox') d[el.dataset.k] = el.checked;
+    else if (el.type === 'number') d[el.dataset.k] = el.value === '' ? '' : Number(el.value);
+    else d[el.dataset.k] = el.value;
+  });
+}
+function worldPicker(ids) {
+  const ws = Object.values(S.worlds);
+  return `<div class="fld"><span>World Books</span>${ws.length ? ws.map(w => `<label class="pickrow"><input type="checkbox" data-w="${w.id}" ${(ids || []).includes(w.id) ? 'checked' : ''}><span>${esc(w.name)} <small style="display:inline">· ${w.entries.length} entries</small></span></label>`).join('') : '<small>No World Books yet. Create them in the Worlds tab.</small>'}</div>`;
+}
+const readWorlds = () => $$('[data-w]:checked').map(e => e.dataset.w);
+function instrPicker(ids) {
+  const ds = Object.values(S.instructions).filter(d => d.scope === 'attached').sort((a, b) => a.createdAt - b.createdAt);
+  return `<div class="fld"><span>Instructions</span>${ds.length ? ds.map(d => `<label class="pickrow"><input type="checkbox" data-ins="${d.id}" ${(ids || []).includes(d.id) ? 'checked' : ''}><span>${esc(d.name)} <small style="display:inline">· ~${est(d.content).toLocaleString()} tokens</small></span></label>`).join('') : '<small>Instruction docs set to "only where attached" (Settings → Instructions) show up here.</small>'}</div>`;
+}
+const readInstr = () => $$('[data-ins]:checked').map(e => e.dataset.ins);
+
+/* ================= Chats list ================= */
+function chatMeta(c) {
+  if (c.type === 'story') { const st = S.stories[c.storyId]; return { name: c.title, avatar: st?.cover || S.characters[c.characterIds?.[0]]?.avatar }; }
+  return { name: c.title, avatar: S.characters[c.charId]?.avatar };
+}
+function viewChats() {
+  const chats = Object.values(S.chats).sort((a, b) => b.updatedAt - a.updatedAt);
+  const st = S.settings;
+  const todo = [];
+  if (!st.apiKey) todo.push('add your OpenRouter key');
+  if (!st.model) todo.push('pick a model');
+  if (!Object.keys(S.personas).length) todo.push('create a persona');
+  const banner = todo.length ? `<div class="banner" onclick="go('#/settings')"><b>Finish setup</b><span class="sm">In Settings: ${todo.join(', ')}.</span></div>` : '';
+  shell({
+    title: 'Chats',
+    body: banner + (chats.length ? `<div class="list">${chats.map(chatRow).join('')}</div>` :
+      empty('No chats yet', 'Start one from a character or a story.', `<button class="btn" onclick="go('#/characters')">Characters</button><button class="btn ghost" onclick="go('#/stories')">Stories</button>`))
+  });
+}
+function chatRow(c) {
+  const m = chatMeta(c); const last = c.messages[c.messages.length - 1];
+  const txt = last ? macroFor(c, last, msgText(last)) : '';
+  return `<div class="row" onclick="go('#/chat/${c.id}')">${avatar(m.avatar, m.name, 50)}<div class="rowmain"><div class="rowtop"><b class="clamp1">${esc(m.name)}</b><span class="muted sm">${ago(c.updatedAt)}</span></div><div class="muted sm clamp2">${esc(txt.slice(0, 160))}</div></div></div>`;
+}
+
+/* ================= Characters ================= */
+function viewCharacters() {
+  const list = Object.values(S.characters).sort((a, b) => b.updatedAt - a.updatedAt);
+  shell({
+    title: 'Characters',
+    actions: `<button class="icon" onclick="charBuilder()" aria-label="Build with AI">${ic('spark')}</button><button class="icon" onclick="importCharacter()" aria-label="Import card">${ic('upload')}</button><button class="icon" onclick="edit('#/char/new')" aria-label="New character">${ic('plus', 24)}</button>`,
+    body: list.length ? `<input class="search" placeholder="Search name, tag or tagline" oninput="filterCards(this.value)"><div class="grid" id="cards">${list.map(charCard).join('')}</div>` :
+      empty('No characters yet', 'Create one, or import a Tavern / Chub card (PNG or JSON).', `<button class="btn" onclick="charBuilder()">${ic('spark', 16)} Build with AI</button><button class="btn ghost" onclick="edit('#/char/new')">Create manually</button><button class="btn ghost" onclick="importCharacter()">Import card</button>`)
+  });
+}
+function charCard(c) {
+  const s = (c.name + ' ' + (c.tags || []).join(' ') + ' ' + (c.tagline || '')).toLowerCase();
+  return `<div class="card" data-s="${esc(s)}" onclick="charSheet('${c.id}')"><div class="cardimg">${c.avatar ? `<img src="${c.avatar}" alt="">` : `<div class="ph big">${esc((c.name[0] || '?').toUpperCase())}</div>`}</div><div class="cardbody"><b class="clamp1">${esc(c.name)}</b><div class="muted sm clamp2">${esc(c.tagline || c.description || '')}</div></div></div>`;
+}
+function filterCards(q) { q = q.toLowerCase(); $$('#cards .card').forEach(el => el.style.display = el.dataset.s.includes(q) ? '' : 'none'); }
+function charSheet(id) {
+  const c = S.characters[id];
+  const chats = Object.values(S.chats).filter(x => x.type === 'char' && x.charId === id).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3);
+  modal(`<div class="sheethead">${avatar(c.avatar, c.name, 72)}<div><h3>${esc(c.name)}</h3><div class="muted sm">${c.age ? `Age ${esc(c.age)} ` : '<span style="color:var(--danger)">No age set</span> '}${(c.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div></div></div>
+    ${c.tagline ? `<p>${esc(c.tagline)}</p>` : ''}
+    <button class="btn full" onclick="startChat('${id}')">${ic('chat', 16)} Start new chat</button>
+    ${chats.map(x => `<button class="mrow" onclick="go('#/chat/${x.id}')"><b>Continue: ${esc(x.title)}</b><span class="sm muted">${x.messages.length} messages · ${ago(x.updatedAt)}</span></button>`).join('')}
+    <div class="btns"><button class="btn ghost sm" onclick="edit('#/char/${id}')">Edit</button><button class="btn ghost sm" onclick="dupChar('${id}')">Duplicate</button><button class="btn ghost sm" onclick="exportCharacter('${id}')">Export</button><button class="btn danger sm" onclick="deleteChar('${id}')">Delete</button></div>`);
+}
+function viewCharEdit(id) {
+  if (!draft || draft._for !== id) {
+    const src = id === 'new' ? newCharacter() : structuredClone(S.characters[id]);
+    if (!src) return go('#/characters');
+    draft = src; draft._for = id;
+  }
+  const d = draft; d.tagsStr = d.tagsStr ?? (d.tags || []).join(', ');
+  const gl = d.greetings?.length ? d.greetings : [''];
+  shell({
+    title: id === 'new' ? 'New character' : 'Edit character', back: "cancelEdit('#/characters')", nav: false,
+    actions: `<button class="icon" onclick="charAssist()" aria-label="AI assist">${ic('spark')}</button><button class="btn sm" onclick="saveChar()">Save</button>`,
+    body: `<div class="form">${aiBar(d, 'char')}
+      <div class="avpick" onclick="pickCharAvatar()">${avatar(d.avatar, d.name, 104)}<span class="muted sm">Tap to set image</span></div>
+      ${field('Name', 'name', d.name, { req: 1 })}
+      ${field('Age', 'age', d.age, { type: 'number', req: 1, hint: 'Required, 18 or older.' })}
+      ${field('Tagline', 'tagline', d.tagline, { hint: 'One line shown on the card.' })}
+      ${area('Description', 'description', d.description, { rows: 6, hint: 'Appearance, background, who they are. You can use {{char}} and {{user}}.' })}
+      ${area('Personality', 'personality', d.personality, { rows: 3, ph: 'Traits, quirks, speech style' })}
+      ${area('Scenario', 'scenario', d.scenario, { rows: 3, hint: 'The situation when a chat starts.' })}
+      <div class="fld"><span>Greeting</span>${gl.map((g, i) => `<div class="greet"><textarea data-g="${i}" rows="4" placeholder="${i ? 'Alternate greeting' : 'First message the character sends'}">${esc(g)}</textarea>${i ? `<button class="icon" onclick="removeGreeting(${i})" aria-label="Remove">${ic('trash', 16)}</button>` : ''}</div>`).join('')}
+        <button class="btn ghost sm" onclick="addGreeting()">${ic('plus', 14)} Alternate greeting</button><small>Alternates become swipeable versions of the first message.</small></div>
+      ${area('Example dialogue', 'examples', d.examples, { rows: 4, hint: 'Shows the model how {{char}} talks. Style reference only.' })}
+      ${field('Tags', 'tagsStr', d.tagsStr, { ph: 'fantasy, romance, slow burn' })}
+      ${worldPicker(d.worldIds)}
+      ${instrPicker(d.instrIds)}
+      <details><summary class="muted sm" style="margin-bottom:12px">Advanced</summary>
+        ${area('System prompt override', 'systemPrompt', d.systemPrompt, { rows: 5, hint: 'Replaces the default character system prompt for this character only.' })}
+        ${area('Post-history instructions', 'postHistory', d.postHistory, { rows: 3, hint: 'Sent after the chat history, right before each reply. Good for style or length rules.' })}
+      </details>
+    </div>`
+  });
+}
+function syncChar() { readForm(draft); draft.greetings = $$('[data-g]').map(e => e.value); draft.worldIds = readWorlds(); draft.instrIds = readInstr(); }
+function addGreeting() { syncChar(); draft.greetings.push(''); const y = $('#view').scrollTop; viewCharEdit(draft._for); $('#view').scrollTop = y; }
+function removeGreeting(i) { syncChar(); draft.greetings.splice(i, 1); const y = $('#view').scrollTop; viewCharEdit(draft._for); $('#view').scrollTop = y; }
+async function pickCharAvatar() {
+  syncChar(); const f = await pickFile('image/*'); if (!f) return;
+  try { draft.avatar = await resizeImage(await fileToDataURL(f), 640); viewCharEdit(draft._for); } catch (e) { toast('Could not read that image'); }
+}
+async function saveChar() {
+  syncChar(); const d = draft;
+  d.greetings = d.greetings.filter(s => s.trim());
+  if (!d.name.trim()) return toast('Name is required');
+  if (!isAdult(d)) return toast('Characters must be 18 or older. Set an age of 18+.', 3500);
+  d.tags = splitTags(d.tagsStr);
+  if (d._world) { await save('worlds', d._world); if (!d.worldIds.includes(d._world.id)) d.worldIds.push(d._world.id); }
+  const o = { ...d }; for (const k of ['_for', 'tagsStr', '_world', '_undo', '_changed']) delete o[k];
+  await save('characters', o); draft = null; toast('Saved'); go('#/characters');
+}
+async function dupChar(id) { const c = structuredClone(S.characters[id]); c.id = uid(); c.name += ' (copy)'; c.createdAt = now(); await save('characters', c); toast('Duplicated'); go('#/characters'); }
+async function deleteChar(id) {
+  const n = Object.values(S.chats).filter(x => x.charId === id).length;
+  if (!confirm(`Delete ${S.characters[id].name}?${n ? ` ${n} chat(s) with them will remain but lose the profile.` : ''}`)) return;
+  await remove('characters', id); closeModal(); toast('Deleted'); render();
+}
+
+/* ---- Card import / export (Tavern V1/V2, Chub, V3 PNG) ---- */
+function readPngCard(buf) {
+  const dv = new DataView(buf), u8 = new Uint8Array(buf), dec = new TextDecoder('latin1'), found = {};
+  if (dv.getUint32(0) !== 0x89504e47) throw new Error('Not a PNG file');
+  let p = 8;
+  while (p + 8 <= u8.length) {
+    const len = dv.getUint32(p), type = dec.decode(u8.subarray(p + 4, p + 8)), data = u8.subarray(p + 8, p + 8 + len);
+    if (type === 'tEXt') { const z = data.indexOf(0); found[dec.decode(data.subarray(0, z)).toLowerCase()] = dec.decode(data.subarray(z + 1)); }
+    if (type === 'IEND') break;
+    p += 12 + len;
+  }
+  const b64 = found.ccv3 || found.chara;
+  if (!b64) throw new Error('No character data found in this PNG');
+  const bin = atob(b64.trim()); const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function cardToCharacter(card) {
+  const d = card.data || card, c = newCharacter();
+  c.name = d.name || d.char_name || 'Imported character';
+  c.description = d.description || d.char_persona || '';
+  c.personality = d.personality || '';
+  c.scenario = d.scenario || d.world_scenario || '';
+  c.greetings = [d.first_mes || d.char_greeting, ...(d.alternate_greetings || [])].filter(Boolean);
+  if (!c.greetings.length) c.greetings = [''];
+  c.examples = d.mes_example || d.example_dialogue || '';
+  c.systemPrompt = d.system_prompt || '';
+  c.postHistory = d.post_history_instructions || '';
+  c.tags = Array.isArray(d.tags) ? d.tags.map(String) : [];
+  c.tagline = d.creator_notes ? String(d.creator_notes).split('\n').find(l => l.trim())?.slice(0, 140) || '' : '';
+  const ext = d.extensions?.lucid; if (ext) { c.age = ext.age ?? ''; c.avatar = ext.avatar || ''; c.tagline = ext.tagline ?? c.tagline; }
+  const book = d.character_book;
+  if (book?.entries?.length) {
+    c._world = { id: uid(), name: book.name || `${c.name} lore`, createdAt: now(),
+      entries: book.entries.map(e => ({ id: uid(), keys: (e.keys || []).join(', '), content: e.content || '', enabled: e.enabled !== false, constant: !!e.constant })) };
+  }
+  return c;
+}
+async function importCharacter() {
+  const f = await pickFile('.png,.json,image/png,application/json'); if (!f) return;
+  try {
+    let card, av = null;
+    if (f.type === 'image/png' || /\.png$/i.test(f.name)) { card = readPngCard(await f.arrayBuffer()); av = await resizeImage(await fileToDataURL(f), 640); }
+    else card = JSON.parse(await f.text());
+    const c = cardToCharacter(card); if (av) c.avatar = av;
+    draft = c; draft._for = 'new';
+    toast(c._world ? 'Imported with lore book. Check the age, then save.' : 'Imported. Check the age, then save.', 3500);
+    go('#/char/new');
+  } catch (e) { toast('Could not import: ' + e.message, 4000); }
+}
+function exportCharacter(id) {
+  const c = S.characters[id];
+  const card = { spec: 'chara_card_v2', spec_version: '2.0', data: {
+    name: c.name, description: c.description, personality: c.personality, scenario: c.scenario,
+    first_mes: c.greetings[0] || '', alternate_greetings: c.greetings.slice(1), mes_example: c.examples,
+    system_prompt: c.systemPrompt, post_history_instructions: c.postHistory, tags: c.tags, creator_notes: c.tagline,
+    character_book: (c.worldIds || []).length ? { name: `${c.name} lore`, entries: c.worldIds.flatMap(w => S.worlds[w]?.entries || []).map((e, i) => ({ id: i, keys: splitTags(e.keys), content: e.content, enabled: e.enabled, constant: e.constant, insertion_order: i })) } : undefined,
+    extensions: { lucid: { age: c.age, avatar: c.avatar, tagline: c.tagline } } } };
+  download(`${c.name}.json`, JSON.stringify(card, null, 2));
+}
+
+/* ================= Stories ================= */
+function viewStories() {
+  const list = Object.values(S.stories).sort((a, b) => b.updatedAt - a.updatedAt);
+  shell({
+    title: 'Stories', actions: `<button class="icon" onclick="storyBuilder()" aria-label="Build with AI">${ic('spark')}</button><button class="icon" onclick="edit('#/story/new')" aria-label="New story">${ic('plus', 24)}</button>`,
+    body: list.length ? `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">${list.map(s => `<div class="card wide" onclick="storySheet('${s.id}')"><div class="cardimg">${s.cover ? `<img src="${s.cover}" alt="">` : `<div class="ph big">${esc((s.title[0] || '?').toUpperCase())}</div>`}</div><div class="cardbody"><b>${esc(s.title)}</b><div class="inrow" style="gap:3px;margin:5px 0">${s.characterIds.map(id => S.characters[id]).filter(Boolean).map(c => avatar(c.avatar, c.name, 24)).join('')}${s.narrator ? '<span class="tag">narrator</span>' : ''}</div><div class="muted sm clamp2">${esc(s.premise)}</div></div></div>`).join('')}</div>` :
+      empty('No stories yet', 'A story is a setting, an opening scene and a cast of up to 5 characters, with an optional narrator.', `<button class="btn" onclick="storyBuilder()">${ic('spark', 16)} Build with AI</button><button class="btn ghost" onclick="edit('#/story/new')">Create manually</button>`)
+  });
+}
+function storySheet(id) {
+  const s = S.stories[id];
+  const chats = Object.values(S.chats).filter(x => x.type === 'story' && x.storyId === id).sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3);
+  modal(`<h3>${esc(s.title)}</h3><p class="muted sm">${esc(s.premise.slice(0, 300))}</p>
+    <button class="btn full" onclick="startStory('${id}')">${ic('book', 16)} Start story</button>
+    ${chats.map(x => `<button class="mrow" onclick="go('#/chat/${x.id}')"><b>Continue: ${esc(x.title)}</b><span class="sm muted">${x.messages.length} messages · ${ago(x.updatedAt)}</span></button>`).join('')}
+    <div class="btns"><button class="btn ghost sm" onclick="edit('#/story/${id}')">Edit</button><button class="btn danger sm" onclick="deleteStory('${id}')">Delete</button></div>`);
+}
+function viewStoryEdit(id) {
+  if (!draft || draft._for !== id) {
+    const src = id === 'new' ? newStory() : structuredClone(S.stories[id]);
+    if (!src) return go('#/stories');
+    draft = src; draft._for = id;
+  }
+  const d = draft; d.tagsStr = d.tagsStr ?? (d.tags || []).join(', ');
+  const chars = [...Object.values(S.characters).sort((a, b) => a.name.localeCompare(b.name)), ...(d._newChars || [])];
+  const isNew = c => (d._newChars || []).includes(c);
+  shell({
+    title: id === 'new' ? 'New story' : 'Edit story', back: "cancelEdit('#/stories')", nav: false,
+    actions: `<button class="icon" onclick="storyAssist()" aria-label="AI assist">${ic('spark')}</button><button class="btn sm" onclick="saveStory()">Save</button>`,
+    body: `<div class="form">${aiBar(d, 'story')}
+      <div class="coverpick" onclick="pickCover()">${d.cover ? `<img src="${d.cover}" alt="">` : '<span class="muted">Tap to add a cover image</span>'}</div>
+      ${field('Title', 'title', d.title, { req: 1 })}
+      ${area('Setting & premise', 'premise', d.premise, { rows: 6, hint: 'The world, the situation and the stakes. Sent with every reply.' })}
+      ${area('Opening scene', 'opening', d.opening, { rows: 6, hint: 'The first message, written by the narrator. You can use {{user}}.' })}
+      <div class="fld"><span>Cast (up to 5)</span>${chars.length ? chars.map(c => `<label class="pickrow"><input type="checkbox" data-cast="${c.id}" ${d.characterIds.includes(c.id) ? 'checked' : ''}>${avatar(c.avatar, c.name, 32)}<span>${esc(c.name)}${isNew(c) ? ' <span class="tag">new</span>' : ''}${isAdult(c) ? '' : ' <small style="display:inline;color:var(--danger)">· needs an age</small>'}${isNew(c) && c.tagline ? `<small>${esc(c.tagline)}</small>` : ''}</span></label>`).join('') + ((d._newChars || []).length ? '<small>New characters are saved when you save the story. Edit them afterwards in Characters.</small>' : '') : '<small>Create characters first in the Characters tab.</small>'}</div>
+      <label class="pickrow" style="margin-bottom:12px"><input type="checkbox" data-k="narrator" ${d.narrator ? 'checked' : ''}><span><b>Narrator</b><small>Describes scenes and can voice anyone. Turn off for pure character group chat.</small></span></label>
+      ${area('Narration style', 'narratorNotes', d.narratorNotes, { rows: 3, ph: 'e.g. Second person, present tense, slow pacing, rich sensory detail' })}
+      ${worldPicker(d.worldIds)}
+      ${instrPicker(d.instrIds)}
+      ${field('Tags', 'tagsStr', d.tagsStr)}
+    </div>`
+  });
+}
+function syncStory() { readForm(draft); draft.characterIds = $$('[data-cast]:checked').map(e => e.dataset.cast); draft.worldIds = readWorlds(); draft.instrIds = readInstr(); }
+async function pickCover() {
+  syncStory(); const f = await pickFile('image/*'); if (!f) return;
+  try { draft.cover = await resizeImage(await fileToDataURL(f), 960); viewStoryEdit(draft._for); } catch (e) { toast('Could not read that image'); }
+}
+async function saveStory() {
+  syncStory(); const d = draft;
+  if (!d.title.trim()) return toast('Title is required');
+  if (d.characterIds.length > 5) return toast('Up to 5 cast members');
+  if (!d.characterIds.length && !d.narrator) return toast('Add at least one cast member or turn on the narrator');
+  d.tags = splitTags(d.tagsStr);
+  for (const c of d._newChars || []) if (d.characterIds.includes(c.id)) await save('characters', c);
+  const o = { ...d }; for (const k of ['_for', 'tagsStr', '_newChars', '_undo', '_changed']) delete o[k];
+  await save('stories', o); draft = null; toast('Saved'); go('#/stories');
+}
+async function deleteStory(id) { if (!confirm('Delete this story? Existing chats remain.')) return; await remove('stories', id); closeModal(); toast('Deleted'); go('#/stories'); }
+
+/* ================= World Books ================= */
+function viewWorlds() {
+  const ws = Object.values(S.worlds).sort((a, b) => b.updatedAt - a.updatedAt);
+  shell({
+    title: 'World Books', actions: `<button class="icon" onclick="edit('#/world/new')" aria-label="New World Book">${ic('plus', 24)}</button>`,
+    body: ws.length ? `<p class="sm muted">Lore pulled into the prompt when its keywords come up. Attach World Books to characters or stories.</p><div class="list">${ws.map(w => `<div class="row" onclick="edit('#/world/${w.id}')"><div class="av ph" style="width:46px;height:46px">${ic('globe', 22)}</div><div class="rowmain"><b>${esc(w.name)}</b><div class="muted sm">${w.entries.length} entries</div></div></div>`).join('')}</div>` :
+      empty('No World Books yet', 'Keep places, factions, history and recurring facts here so you don\'t repeat them in every character.', `<button class="btn" onclick="edit('#/world/new')">Create World Book</button>`)
+  });
+}
+function viewWorldEdit(id) {
+  if (!draft || draft._for !== id) {
+    const src = id === 'new' ? newWorld() : structuredClone(S.worlds[id]);
+    if (!src) return go('#/worlds');
+    draft = src; draft._for = id;
+  }
+  const d = draft;
+  shell({
+    title: id === 'new' ? 'New World Book' : 'Edit World Book', back: "cancelEdit('#/worlds')", nav: false,
+    actions: `<button class="btn sm" onclick="saveWorld()">Save</button>`,
+    body: `<div class="form">${field('Name', 'name', d.name, { req: 1 })}
+      <p class="sm muted">An entry is sent when one of its keywords appears in the last few messages. "Always on" entries are sent every time.</p>
+      ${d.entries.map((e, i) => `<div class="entry"><div class="inrow"><input data-ek="${i}" value="${esc(e.keys)}" placeholder="Keywords, comma separated"><button class="icon" onclick="delEntry(${i})" aria-label="Delete entry">${ic('trash', 16)}</button></div>
+        <textarea data-ec="${i}" rows="4" placeholder="What the AI should know when these come up">${esc(e.content)}</textarea>
+        <div class="inrow sm" style="gap:18px"><label><input type="checkbox" data-een="${i}" ${e.enabled ? 'checked' : ''}> Enabled</label><label><input type="checkbox" data-eco="${i}" ${e.constant ? 'checked' : ''}> Always on</label></div></div>`).join('')}
+      <button class="btn ghost" onclick="addEntry()">${ic('plus', 16)} Add entry</button>
+      ${id !== 'new' ? `<div style="margin-top:24px"><button class="btn danger" onclick="deleteWorld('${id}')">Delete World Book</button></div>` : ''}
+    </div>`
+  });
+}
+function syncWorld() {
+  readForm(draft);
+  draft.entries.forEach((e, i) => { e.keys = $(`[data-ek="${i}"]`).value; e.content = $(`[data-ec="${i}"]`).value; e.enabled = $(`[data-een="${i}"]`).checked; e.constant = $(`[data-eco="${i}"]`).checked; });
+}
+function addEntry() { syncWorld(); draft.entries.push(newEntry()); viewWorldEdit(draft._for); const v = $('#view'); v.scrollTop = v.scrollHeight; }
+function delEntry(i) { syncWorld(); draft.entries.splice(i, 1); const y = $('#view').scrollTop; viewWorldEdit(draft._for); $('#view').scrollTop = y; }
+async function saveWorld() {
+  syncWorld(); const d = draft;
+  if (!d.name.trim()) return toast('Name is required');
+  d.entries = d.entries.filter(e => e.content.trim() || e.keys.trim());
+  const o = { ...d }; delete o._for;
+  await save('worlds', o); draft = null; toast('Saved'); go('#/worlds');
+}
+async function deleteWorld(id) { if (!confirm('Delete this World Book?')) return; await remove('worlds', id); draft = null; toast('Deleted'); go('#/worlds'); }
+
+/* ================= Personas ================= */
+function currentPersona() { return S.personas[S.settings.defaultPersonaId] || Object.values(S.personas)[0] || null; }
+function viewPersonaEdit(id) {
+  if (!draft || draft._for !== id) {
+    const src = id === 'new' ? newPersona() : structuredClone(S.personas[id]);
+    if (!src) return go('#/settings');
+    draft = src; draft._for = id;
+  }
+  const d = draft; d.isDefault = d.isDefault ?? (S.settings.defaultPersonaId === d.id || !Object.keys(S.personas).length);
+  shell({
+    title: id === 'new' ? 'New persona' : 'Edit persona', back: "cancelEdit('#/settings')", nav: false,
+    actions: `<button class="btn sm" onclick="savePersona()">Save</button>`,
+    body: `<div class="form"><div class="avpick" onclick="pickPersonaAvatar()">${avatar(d.avatar, d.name, 96)}<span class="muted sm">Tap to set image</span></div>
+      ${field('Name', 'name', d.name, { req: 1, hint: 'Replaces {{user}} in prompts and greetings.' })}
+      ${area('Description', 'description', d.description, { rows: 5, hint: 'Who you are in the story: appearance, background. Sent with every reply.' })}
+      <label class="pickrow"><input type="checkbox" data-k="isDefault" ${d.isDefault ? 'checked' : ''}><span>Use by default for new chats</span></label>
+      ${id !== 'new' ? `<div style="margin-top:20px"><button class="btn danger" onclick="deletePersona('${id}')">Delete persona</button></div>` : ''}</div>`
+  });
+}
+async function pickPersonaAvatar() { readForm(draft); const f = await pickFile('image/*'); if (!f) return; try { draft.avatar = await resizeImage(await fileToDataURL(f), 512); viewPersonaEdit(draft._for); } catch (e) { toast('Could not read that image'); } }
+async function savePersona() {
+  readForm(draft); const d = draft;
+  if (!d.name.trim()) return toast('Name is required');
+  const o = { ...d }; delete o._for; delete o.isDefault;
+  await save('personas', o);
+  if (d.isDefault || !S.settings.defaultPersonaId) setS('defaultPersonaId', o.id);
+  draft = null; toast('Saved'); go('#/settings');
+}
+async function deletePersona(id) {
+  if (!confirm('Delete this persona?')) return;
+  await remove('personas', id);
+  if (S.settings.defaultPersonaId === id) setS('defaultPersonaId', Object.keys(S.personas)[0] || null);
+  draft = null; go('#/settings');
+}
+
+/* ================= Chat model ================= */
+const msgText = m => m.swipes[m.swipeIdx] ?? '';
+function mkMsg(role, swipes, extra = {}) { return { id: uid(), role, swipes: Array.isArray(swipes) ? swipes : [swipes], swipeIdx: 0, time: now(), ...extra }; }
+function macro(t, char, user) { return String(t || '').replace(/\{\{char\}\}/gi, char).replace(/\{\{user\}\}/gi, user).replace(/<BOT>/g, char).replace(/<USER>/g, user); }
+function names(c, speakerId) {
+  const user = S.personas[c.personaId]?.name || 'You';
+  let char;
+  if (c.type === 'char') char = S.characters[c.charId]?.name;
+  else char = (!speakerId || speakerId === 'narrator') ? 'Narrator' : S.characters[speakerId]?.name;
+  return { user, char: char || 'Character' };
+}
+function macroFor(c, m, t) { const n = names(c, m.charId || m.speaker); return macro(t, n.char, n.user); }
+function speakerInfo(c, m) {
+  if (m.role === 'user') { const p = S.personas[c.personaId]; return { name: p?.name || 'You', avatar: p?.avatar }; }
+  if (m.speaker === 'narrator') return { name: 'Narrator', avatar: S.stories[c.storyId]?.cover };
+  const ch = S.characters[m.charId || m.speaker]; return { name: ch?.name || 'Character', avatar: ch?.avatar };
+}
+function ready() {
+  if (!S.settings.apiKey) { toast('Add your OpenRouter API key in Settings', 3500); return false; }
+  if (!S.settings.model) { toast('Pick a model in Settings', 3500); return false; }
+  return true;
+}
+async function startChat(charId) {
+  const ch = S.characters[charId];
+  if (!isAdult(ch)) { toast('Set an age of 18+ on this character first', 3500); return edit('#/char/' + charId); }
+  const p = currentPersona();
+  const c = { id: uid(), type: 'char', charId, title: ch.name, personaId: p?.id || null, model: '', memory: '', messages: [], createdAt: now() };
+  const greets = (ch.greetings || []).filter(g => g.trim());
+  if (greets.length) c.messages.push(mkMsg('assistant', greets, { charId }));
+  await save('chats', c); closeModal(); go('#/chat/' + c.id);
+}
+async function startStory(storyId) {
+  const st = S.stories[storyId];
+  const cast = st.characterIds.map(id => S.characters[id]).filter(Boolean);
+  const minor = cast.find(c => !isAdult(c));
+  if (minor) { toast(`Set an age of 18+ on ${minor.name} first`, 3500); return edit('#/char/' + minor.id); }
+  const p = currentPersona();
+  const c = { id: uid(), type: 'story', storyId, title: st.title, characterIds: cast.map(x => x.id), narrator: st.narrator || !cast.length, personaId: p?.id || null, model: '', memory: '', messages: [], createdAt: now() };
+  if (st.opening.trim()) c.messages.push(mkMsg('assistant', st.opening, { speaker: 'narrator' }));
+  await save('chats', c); closeModal(); go('#/chat/' + c.id);
+}
+
+/* ================= Prompt building ================= */
+function charBlock(ch, M, full) {
+  if (!ch) return '';
+  const L = [full ? `# ${ch.name}` : `## ${ch.name}`];
+  if (ch.age) L.push(`Age: ${ch.age}`);
+  if (ch.description) L.push(`Description:\n${M(ch.description)}`);
+  if (ch.personality) L.push(`Personality: ${M(ch.personality)}`);
+  if (full && ch.scenario) L.push(`# Scenario\n${M(ch.scenario)}`);
+  if (full && ch.examples) L.push(`# Example dialogue (style reference only, not part of the story)\n${M(ch.examples)}`);
+  return L.join('\n');
+}
+function matchLore(c, history) {
+  const ids = new Set(c.worldIds || []);
+  if (c.type === 'char') (S.characters[c.charId]?.worldIds || []).forEach(i => ids.add(i));
+  else { (S.stories[c.storyId]?.worldIds || []).forEach(i => ids.add(i)); (c.characterIds || []).forEach(id => (S.characters[id]?.worldIds || []).forEach(i => ids.add(i))); }
+  const scan = history.slice(-6).map(msgText).join('\n').toLowerCase();
+  const out = [];
+  for (const wid of ids) {
+    const w = S.worlds[wid]; if (!w) continue;
+    for (const e of w.entries || []) {
+      if (!e.enabled || !e.content.trim()) continue;
+      const keys = splitTags(e.keys).map(k => k.toLowerCase());
+      if (e.constant || keys.some(k => scan.includes(k))) out.push(e.content);
+    }
+  }
+  return out;
+}
+function mergeRoles(arr) { const out = []; for (const m of arr) { const l = out[out.length - 1]; if (l && l.role === m.role && m.role !== 'system') l.content += '\n\n' + m.content; else out.push({ ...m }); } return out; }
+function buildPrompt(c, history, speakerId, contMsg) {
+  const st = S.settings, n = names(c, speakerId), p = S.personas[c.personaId];
+  const M = t => macro(t, n.char, n.user);
+  const parts = []; let ch = null;
+  if (c.type === 'char') {
+    ch = S.characters[c.charId];
+    parts.push(M(ch?.systemPrompt?.trim() ? ch.systemPrompt : st.systemTemplate));
+    parts.push(charBlock(ch, M, true));
+  } else {
+    const story = S.stories[c.storyId] || {};
+    if (speakerId === 'narrator') parts.push(M(st.narratorTemplate || DEFAULT_NARRATOR));
+    else {
+      ch = S.characters[speakerId];
+      parts.push(M(ch?.systemPrompt?.trim() ? ch.systemPrompt : st.systemTemplate));
+      parts.push(M('This is a group story. In this reply, write ONLY as {{char}}. Other cast members may be present, but do not write their dialogue or actions.'));
+    }
+    if (story.premise) parts.push(`# Story setting\n${M(story.premise)}`);
+    if (speakerId === 'narrator' && story.narratorNotes) parts.push(`# Narration style\n${M(story.narratorNotes)}`);
+    const cast = (c.characterIds || []).map(id => S.characters[id]).filter(Boolean);
+    if (cast.length) parts.push('# Cast\n' + cast.map(x => charBlock(x, t => macro(t, x.name, n.user), false)).join('\n\n'));
+    if (ch?.examples) parts.push(`# Example dialogue for ${ch.name} (style reference only)\n${macro(ch.examples, ch.name, n.user)}`);
+  }
+  const instr = activeInstructions(c, speakerId);
+  const top = instr.filter(x => x.position !== 'bottom'), bottom = instr.filter(x => x.position === 'bottom');
+  if (top.length) parts.splice(1, 0, ...top.map(x => `# Instructions: ${x.name}\n${M(x.content)}`));
+  if (p?.description) parts.push(`# About ${n.user} (played by the user)\n${M(p.description)}`);
+  const lore = matchLore(c, history); if (lore.length) parts.push('# Lore\n' + lore.map(M).join('\n\n'));
+  if (c.memory?.trim()) parts.push(`# Memory (key facts and the story so far)\n${M(c.memory)}`);
+  parts.push(ADULT_RULE);
+  const system = parts.filter(Boolean).join('\n\n');
+
+  const group = c.type === 'story';
+  const msgs = history.map(m => {
+    const txt = macroFor(c, m, msgText(m));
+    if (m.role === 'user') return { role: 'user', content: group ? `${n.user}: ${txt}` : txt };
+    const sid = m.charId || m.speaker;
+    if (!group || sid === speakerId) return { role: 'assistant', content: txt };
+    return { role: 'user', content: `${speakerInfo(c, m).name}: ${txt}` };
+  }).filter(m => m.content.trim());
+
+  const tailExtra = [];
+  if (contMsg) tailExtra.push({ role: 'assistant', content: macroFor(c, contMsg, msgText(contMsg)) }, { role: 'user', content: '[Continue your previous reply from exactly where it stopped. Do not repeat anything already written.]' });
+  const post = [];
+  if (ch?.postHistory?.trim()) post.push(M(ch.postHistory));
+  bottom.forEach(x => post.push(M(x.content)));
+  if (group && !contMsg) post.push(speakerId === 'narrator' ? "[Write the narrator's next passage.]" : `[Write ${n.char}'s next reply only.]`);
+
+  let budget = Number(st.contextTokens || 16000) - Number(st.maxTokens || 600) - est(system) - est(post.join('')) - est(tailExtra.map(x => x.content).join('')) - 200;
+  const kept = [];
+  for (let i = msgs.length - 1; i >= 0; i--) { const t = est(msgs[i].content) + 4; if (budget - t < 0 && kept.length) break; budget -= t; kept.unshift(msgs[i]); }
+  let convo = mergeRoles([...kept, ...tailExtra]);
+  if (!convo.length || convo[0].role !== 'user') convo.unshift({ role: 'user', content: '[The roleplay begins.]' });
+  if (post.length) convo.push({ role: 'system', content: post.join('\n') });
+  c._ctx = { used: kept.length, total: msgs.length, tokens: Number(st.contextTokens) - budget - Number(st.maxTokens) };
+  return [{ role: 'system', content: system }, ...convo];
+}
+
+/* ================= OpenRouter ================= */
+async function streamChat(messages, signal, onDelta, opts = {}) {
+  const st = S.settings;
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST', signal,
+    headers: { 'Authorization': 'Bearer ' + st.apiKey, 'Content-Type': 'application/json', 'HTTP-Referer': (location.origin && location.origin !== 'null') ? location.origin : 'https://lucid.local', 'X-Title': 'Lucid' },
+    body: JSON.stringify({ model: opts.model || st.model, messages, stream: true, temperature: Number(st.temperature), max_tokens: Number(opts.maxTokens || st.maxTokens) })
+  });
+  if (!res.ok) {
+    let msg = `${res.status} ${res.statusText}`;
+    try { const j = await res.json(); msg = j.error?.message || msg; } catch (e) {}
+    throw new Error('OpenRouter: ' + msg);
+  }
+  const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
+  while (true) {
+    const { done, value } = await reader.read(); if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let nl;
+    while ((nl = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim(); if (data === '[DONE]') return;
+      let j; try { j = JSON.parse(data); } catch (e) { continue; }
+      if (j.error) throw new Error('OpenRouter: ' + (j.error.message || 'stream error'));
+      const d = j.choices?.[0]?.delta?.content; if (d) onDelta(d);
+    }
+  }
+}
+async function ensureModels(force) {
+  const st = S.settings;
+  if (!force && st.models?.length && now() - st.modelsFetched < 864e5) return;
+  try {
+    const r = await fetch('https://openrouter.ai/api/v1/models'); const j = await r.json();
+    st.models = j.data.map(m => ({ id: m.id, name: m.name, ctx: m.context_length, pin: m.pricing?.prompt, pout: m.pricing?.completion }));
+    st.modelsFetched = now(); await saveSettings();
+  } catch (e) { toast('Could not load model list: ' + e.message); }
+}
+const price = p => { const v = Number(p) * 1e6; return !isFinite(v) ? '?' : v === 0 ? 'free' : '$' + (v < 1 ? v.toFixed(2) : v.toFixed(v < 10 ? 2 : 0)); };
+const fmtCtx = n => !n ? '?' : n >= 1e6 ? (n / 1e6).toFixed(1).replace('.0', '') + 'M' : Math.round(n / 1000) + 'k';
+let _onPick = null;
+async function modelPicker(onPick) {
+  _onPick = onPick;
+  modal(`<h3>Choose a model</h3><input class="search" id="mq" placeholder="Search (deepseek, llama, mistral, :free…)" oninput="paintModels()" autocomplete="off"><div class="sm muted" id="mstat">Loading…</div><div id="mlist" class="mlist"></div>`);
+  await ensureModels(); paintModels();
+}
+function paintModels() {
+  const qEl = $('#mq'); if (!qEl) return;
+  const q = qEl.value.trim().toLowerCase();
+  const all = S.settings.models || [];
+  const list = all.filter(m => (m.id + ' ' + m.name).toLowerCase().includes(q)).slice(0, 150);
+  $('#mstat').textContent = all.length ? `${list.length} of ${all.length} models · prices per 1M tokens in/out` : 'Model list unavailable. Type a model ID to use it directly.';
+  $('#mlist').innerHTML = list.map(m => `<button class="mrow" onclick="pickModel('${esc(m.id)}')"><b>${esc(m.name)}</b><span class="sm muted">${esc(m.id)} · ${fmtCtx(m.ctx)} context · ${price(m.pin)} / ${price(m.pout)}</span></button>`).join('')
+    + (q ? `<button class="mrow" onclick="pickModel('${esc(qEl.value.trim())}')"><b>Use “${esc(qEl.value.trim())}” as a model ID</b></button>` : '');
+}
+function pickModel(id) { const f = _onPick; closeModal(); if (f) f(id); }
+
+/* ================= Chat view ================= */
+let gen = null;          // { chatId, ctrl, msgId }
+let nextSpeaker = 'auto';
+let paintPending = false;
+const isViewing = id => { const r = route(); return r.a === 'chat' && r.b === id; };
+function viewChat(id) {
+  const c = S.chats[id]; if (!c) return go('#/chats');
+  if (!gen || gen.chatId !== id) nextSpeaker = 'auto';
+  const ph = c.type === 'story' ? 'Your move… (send empty to let the story continue)' : `Message ${c.title}…`;
+  shell({
+    title: c.title, back: "go('#/chats')", nav: false, cls: 'chatview',
+    actions: `<button class="icon" onclick="memorySheet('${id}')" aria-label="Memory">${ic('bookmark')}</button><button class="icon" onclick="chatMenu('${id}')" aria-label="Chat menu">${ic('more')}</button>`,
+    body: `<div id="msgs" class="msgs"></div>${c.type === 'story' ? '<div id="speakers" class="speakers"></div>' : ''}
+      <div class="composer"><button class="icon clipbtn" id="clipbtn" onclick="instrSheet('${id}')" aria-label="Instructions and files">${clipInner(c)}</button><textarea id="inp" rows="1" placeholder="${esc(ph)}" oninput="autoGrow(this)" onkeydown="inpKey(event,'${id}')"></textarea><button id="sendbtn" class="send" onclick="sendOrStop('${id}')" aria-label="Send">${ic(gen ? 'stop' : 'send')}</button></div>`
+  });
+  renderMsgs(c); renderSpeakers(c); scrollBottom();
+}
+function scrollBottom() { const b = $('#msgs'); if (b) b.scrollTop = b.scrollHeight; }
+function updateSendBtn() { const b = $('#sendbtn'); if (b) b.innerHTML = ic(gen ? 'stop' : 'send'); }
+function fmt(t) {
+  let h = esc(t);
+  h = h.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+       .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+       .replace(/&quot;([^\n]*?)&quot;/g, '<span class="q">&quot;$1&quot;</span>')
+       .replace(/“([^”\n]*?)”/g, '<span class="q">“$1”</span>');
+  return h.replace(/\n/g, '<br>');
+}
+function renderMsgs(c) {
+  const el = $('#msgs'); if (!el) return;
+  el.innerHTML = c.messages.map((m, i) => msgHTML(c, m, i)).join('') || `<div class="muted center pad">Say something to begin.</div>`;
+}
+function msgHTML(c, m, i) {
+  const s = speakerInfo(c, m), last = i === c.messages.length - 1, n = m.swipes.length;
+  const streaming = gen && gen.msgId === m.id;
+  const sw = m.role === 'assistant' && (n > 1 || last)
+    ? `<button onclick="swipe('${c.id}',${i},-1)" ${m.swipeIdx === 0 ? 'disabled' : ''} aria-label="Previous version">${ic('left', 16)}</button><span class="sm muted">${m.swipeIdx + 1}/${n}</span><button onclick="swipe('${c.id}',${i},1)" ${!last && m.swipeIdx === n - 1 ? 'disabled' : ''} aria-label="${last ? 'Next version or regenerate' : 'Next version'}">${ic('right', 16)}</button>` : '';
+  return `<div class="msg ${m.role}" id="m-${m.id}">${avatar(s.avatar, s.name, 34)}<div class="bub" onclick="selMsg(this,event)"><div class="mname">${esc(s.name)}</div><div class="mtext">${fmt(macroFor(c, m, msgText(m)))}${streaming ? '<span class="caret"></span>' : ''}</div>
+    <div class="mtools">${sw}<button onclick="editMsg('${c.id}',${i})" aria-label="Edit">${ic('edit', 16)}</button><button onclick="branchAt('${c.id}',${i})" aria-label="Branch from here">${ic('branch', 16)}</button><button onclick="copyMsg('${c.id}',${i})" aria-label="Copy">${ic('copy', 16)}</button><button onclick="delMsg('${c.id}',${i})" aria-label="Delete">${ic('trash', 16)}</button>${last && m.role === 'assistant' ? `<button onclick="continueMsg('${c.id}')" aria-label="Continue">${ic('cont', 16)}</button>` : ''}</div></div></div>`;
+}
+function selMsg(el, e) {
+  if (e.target.closest('button')) return;
+  const msg = el.closest('.msg'), was = msg.classList.contains('sel');
+  $$('.msg.sel').forEach(x => x.classList.remove('sel'));
+  if (!was) msg.classList.add('sel');
+}
+function paintMsg(c, m) {
+  if (paintPending) return; paintPending = true;
+  requestAnimationFrame(() => {
+    paintPending = false;
+    const el = document.querySelector(`#m-${m.id} .mtext`); if (!el) return;
+    const box = $('#msgs'); const near = box && box.scrollHeight - box.scrollTop - box.clientHeight < 140;
+    el.innerHTML = fmt(macroFor(c, m, msgText(m))) + '<span class="caret"></span>';
+    if (near) box.scrollTop = box.scrollHeight;
+  });
+}
+function renderSpeakers(c) {
+  const el = $('#speakers'); if (!el) return;
+  const opts = [['auto', 'Auto', null]];
+  if (c.narrator) opts.push(['narrator', 'Narrator', S.stories[c.storyId]?.cover]);
+  (c.characterIds || []).forEach(id => { const ch = S.characters[id]; if (ch) opts.push([id, ch.name, ch.avatar]); });
+  el.innerHTML = `<span class="sm muted">Next:</span>` + opts.map(([id, n, a]) => `<button class="chip ${nextSpeaker === id ? 'on' : ''}" onclick="setSpeaker('${c.id}','${id}')">${id === 'auto' ? '' : avatar(a, n, 22)}${esc(n)}</button>`).join('');
+}
+function setSpeaker(cid, id) { nextSpeaker = id; renderSpeakers(S.chats[cid]); }
+function pickSpeaker(c, text) {
+  if (nextSpeaker !== 'auto') return nextSpeaker;
+  const cast = (c.characterIds || []).filter(id => S.characters[id]);
+  const lower = (text || '').toLowerCase();
+  const named = cast.find(id => { const first = S.characters[id].name.toLowerCase().split(/\s+/)[0]; return first && new RegExp('\\b' + first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(lower); });
+  if (named) return named;
+  if (c.narrator || !cast.length) return 'narrator';
+  const lastA = [...c.messages].reverse().find(m => m.role === 'assistant');
+  return cast[(cast.indexOf(lastA?.speaker) + 1) % cast.length];
+}
+function inpKey(e, id) { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); sendOrStop(id); } }
+async function sendOrStop(id) {
+  if (gen) { gen.ctrl.abort(); return; }
+  if (!ready()) return;
+  const c = S.chats[id], inp = $('#inp'), text = inp.value.trim();
+  if (text) { c.messages.push(mkMsg('user', text)); inp.value = ''; autoGrow(inp); }
+  const speaker = c.type === 'story' ? pickSpeaker(c, text) : c.charId;
+  const m = mkMsg('assistant', '', c.type === 'story' ? { speaker } : { charId: c.charId });
+  c.messages.push(m);
+  await generate(c, m, 'new');
+}
+function cleanReply(t, name) {
+  t = t.replace(/^\s+/, '');
+  if (name) {
+    for (const n of [name, name.split(/\s+/)[0]]) {
+      const re = new RegExp('^\\*{0,2}' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\*{0,2}:\\s*', 'i');
+      if (re.test(t)) { t = t.replace(re, ''); break; }
+    }
+  }
+  return t.trimEnd();
+}
+async function generate(c, m, mode) {
+  const idx = c.messages.indexOf(m), history = c.messages.slice(0, idx);
+  let base = '';
+  if (mode === 'swipe') { m.swipes.push(''); m.swipeIdx = m.swipes.length - 1; }
+  if (mode === 'continue') base = msgText(m);
+  const speakerId = m.charId || m.speaker;
+  const payload = buildPrompt(c, history, speakerId, mode === 'continue' ? m : null);
+  const ctrl = new AbortController();
+  gen = { chatId: c.id, ctrl, msgId: m.id };
+  if (isViewing(c.id)) { renderMsgs(c); updateSendBtn(); scrollBottom(); }
+  let out = '';
+  const join = () => (base && out && !/\s$/.test(base) && !/^[\s.,!?;:'"”)\]—-]/.test(out)) ? ' ' : '';
+  try {
+    await streamChat(payload, ctrl.signal, d => { out += d; m.swipes[m.swipeIdx] = base + join() + out; paintMsg(c, m); }, { model: c.model || S.settings.model });
+  } catch (e) {
+    if (e.name !== 'AbortError') toast(e.message, 6000);
+  }
+  if (!out.trim()) {
+    if (mode === 'new') c.messages.splice(c.messages.indexOf(m), 1);
+    else if (mode === 'swipe') { m.swipes.pop(); m.swipeIdx = m.swipes.length - 1; }
+    else m.swipes[m.swipeIdx] = base;
+  } else if (mode !== 'continue') {
+    m.swipes[m.swipeIdx] = cleanReply(m.swipes[m.swipeIdx], speakerInfo(c, m).name);
+  }
+  gen = null; m.time = now();
+  await save('chats', c);
+  if (isViewing(c.id)) { renderMsgs(c); updateSendBtn(); }
+}
+async function swipe(id, i, dir) {
+  if (gen) return toast('Wait for the reply to finish');
+  const c = S.chats[id], m = c.messages[i], ni = m.swipeIdx + dir;
+  if (ni < 0) return;
+  if (ni < m.swipes.length) { m.swipeIdx = ni; await save('chats', c); renderMsgs(c); return; }
+  if (i !== c.messages.length - 1 || !ready()) return;
+  await generate(c, m, 'swipe');
+}
+async function continueMsg(id) {
+  if (gen || !ready()) return;
+  const c = S.chats[id], m = c.messages[c.messages.length - 1];
+  if (m?.role === 'assistant') await generate(c, m, 'continue');
+}
+function editMsg(id, i) {
+  if (gen) return toast('Wait for the reply to finish');
+  const c = S.chats[id], m = c.messages[i];
+  modal(`<h3>Edit message</h3><textarea id="edta" rows="10">${esc(msgText(m))}</textarea><div class="btns"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveEdit('${id}',${i})">Save</button></div>`);
+}
+async function saveEdit(id, i) { const c = S.chats[id], m = c.messages[i]; m.swipes[m.swipeIdx] = $('#edta').value; await save('chats', c); closeModal(); renderMsgs(c); }
+function delMsg(id, i) {
+  if (gen) return toast('Wait for the reply to finish');
+  const c = S.chats[id], m = c.messages[i];
+  modal(`<h3>Delete</h3>${m.swipes.length > 1 ? `<button class="mrow" onclick="delSwipe('${id}',${i})"><b>Delete this version only</b></button>` : ''}
+    <button class="mrow" onclick="delMsgDo('${id}',${i},false)"><b>Delete this message</b></button>
+    ${i < c.messages.length - 1 ? `<button class="mrow danger" onclick="delMsgDo('${id}',${i},true)"><b>Delete this and everything after</b></button>` : ''}
+    <button class="btn ghost full" onclick="closeModal()">Cancel</button>`);
+}
+async function delSwipe(id, i) { const c = S.chats[id], m = c.messages[i]; m.swipes.splice(m.swipeIdx, 1); m.swipeIdx = Math.min(m.swipeIdx, m.swipes.length - 1); await save('chats', c); closeModal(); renderMsgs(c); }
+async function delMsgDo(id, i, after) { const c = S.chats[id]; c.messages.splice(i, after ? c.messages.length - i : 1); await save('chats', c); closeModal(); renderMsgs(c); }
+async function branchAt(id, i) {
+  if (gen) return toast('Wait for the reply to finish');
+  const src = S.chats[id];
+  const c = structuredClone(src); c.id = uid(); c.createdAt = now(); delete c._ctx;
+  c.messages = structuredClone(src.messages.slice(0, i + 1));
+  c.title = src.title.replace(/ · branch( \d+)?$/, '') + ' · branch';
+  await save('chats', c); closeModal(); toast('Branched. You are now in the new copy.'); go('#/chat/' + c.id);
+}
+async function copyMsg(id, i) {
+  const c = S.chats[id], m = c.messages[i];
+  try { await navigator.clipboard.writeText(macroFor(c, m, msgText(m))); toast('Copied'); } catch (e) { toast('Copy failed'); }
+}
+function memorySheet(id) {
+  const c = S.chats[id], x = c._ctx;
+  modal(`<h3>Memory</h3><p class="sm muted">Sent with every reply. When a chat gets long, older messages drop out of context; this note is how the story keeps them.</p>
+    <textarea id="memta" rows="10" placeholder="Key facts, relationships, what has happened so far…">${esc(c.memory || '')}</textarea>
+    ${x ? `<p class="sm muted">Last reply included ${x.used} of ${x.total} messages (~${Math.max(0, x.tokens).toLocaleString()} tokens of context).</p>` : ''}
+    <div class="btns"><button class="btn ghost" id="sumbtn" onclick="summarize('${id}')">Summarize story so far</button><button class="btn" onclick="saveMemory('${id}')">Save</button></div>`);
+}
+async function saveMemory(id) { const c = S.chats[id]; c.memory = $('#memta').value; await save('chats', c); closeModal(); toast('Memory saved'); }
+async function summarize(id) {
+  if (!ready()) return;
+  const c = S.chats[id], ta = $('#memta'), btn = $('#sumbtn');
+  if (!c.messages.length) return toast('Nothing to summarize yet');
+  btn.disabled = true; btn.textContent = 'Summarizing…';
+  const transcript = c.messages.map(m => `${speakerInfo(c, m).name}: ${macroFor(c, m, msgText(m))}`).join('\n\n').slice(-60000);
+  const existing = ta.value.trim();
+  const msgs = [
+    { role: 'system', content: 'You maintain memory notes for an ongoing collaborative story. Write concise, factual bullet points: key events in order, relationships and how they have changed, important facts, promises, places and items, and the current situation. No commentary. Under 250 words. ' + ADULT_RULE },
+    { role: 'user', content: (existing ? `Existing memory notes:\n${existing}\n\n` : '') + `Transcript:\n${transcript}\n\nWrite the updated memory notes.` }
+  ];
+  let out = '';
+  try { await streamChat(msgs, undefined, d => { out += d; ta.value = out; }, { model: c.model || S.settings.model, maxTokens: 700 }); toast('Review it, then Save'); }
+  catch (e) { toast(e.message, 5000); if (!out) ta.value = existing; }
+  btn.disabled = false; btn.textContent = 'Summarize again';
+}
+function chatMenu(id) {
+  const c = S.chats[id], model = c.model || S.settings.model || 'not set';
+  modal(`<h3>${esc(c.title)}</h3>
+    <button class="mrow" onclick="renameChat('${id}')"><b>Rename</b></button>
+    <button class="mrow" onclick="modelPicker(m => setChatModel('${id}', m))"><b>Model for this chat</b><span class="sm muted">${esc(model)}${c.model ? '' : ' (default)'}</span></button>
+    ${c.model ? `<button class="mrow" onclick="setChatModel('${id}','')"><b>Use default model</b></button>` : ''}
+    <button class="mrow" onclick="instrSheet('${id}')"><b>Instructions & files</b><span class="sm muted">${clipCount(c) ? clipCount(c) + ' attached to this chat' : 'None attached to this chat'}</span></button>
+    <button class="mrow" onclick="personaPick('${id}')"><b>Play as…</b><span class="sm muted">${esc(S.personas[c.personaId]?.name || 'You (no persona)')}</span></button>
+    <button class="mrow" onclick="branchAt('${id}',${c.messages.length - 1})"><b>Duplicate chat</b></button>
+    <button class="mrow" onclick="exportChat('${id}')"><b>Export as text</b></button>
+    <button class="mrow danger" onclick="deleteChat('${id}')"><b>Delete chat</b></button>`);
+}
+async function setChatModel(id, m) { const c = S.chats[id]; c.model = m; await save('chats', c); closeModal(); toast(m ? 'Model set for this chat' : 'Using default model'); }
+async function renameChat(id) { const c = S.chats[id]; const t = prompt('Chat name', c.title); if (t && t.trim()) { c.title = t.trim(); await save('chats', c); render(); } }
+function personaPick(id) {
+  const ps = Object.values(S.personas);
+  modal(`<h3>Play as</h3>${ps.length ? ps.map(p => `<button class="mrow" onclick="setChatPersona('${id}','${p.id}')"><b>${esc(p.name)}</b><span class="sm muted clamp1">${esc(p.description || '')}</span></button>`).join('') : '<p class="muted">No personas yet. Create one in Settings.</p>'}`);
+}
+async function setChatPersona(id, pid) { const c = S.chats[id]; c.personaId = pid; await save('chats', c); closeModal(); renderMsgs(c); toast('Persona changed'); }
+function exportChat(id) {
+  const c = S.chats[id];
+  const txt = c.messages.map(m => `${speakerInfo(c, m).name}:\n${macroFor(c, m, msgText(m))}`).join('\n\n');
+  download(`${c.title}.txt`, txt, 'text/plain');
+}
+async function deleteChat(id) { if (!confirm('Delete this chat permanently?')) return; await remove('chats', id); go('#/chats'); }
+
+/* ================= Instructions (.md) ================= */
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function matchModel(model, patterns) {
+  const m = String(model || '').toLowerCase();
+  return splitTags(patterns).some(p => { p = p.toLowerCase(); return p.includes('*') ? new RegExp('^' + p.split('*').map(escRe).join('.*') + '$').test(m) : m.includes(p); });
+}
+function scopeLabel(d) { return d.scope === 'global' ? 'Every chat' : d.scope === 'models' ? 'Models: ' + (d.models || 'none set') : 'Only where attached'; }
+function inheritedInstr(c, speakerId) {
+  const set = new Set(); const add = o => (o?.instrIds || []).forEach(i => set.add(i));
+  if (c.type === 'char') add(S.characters[c.charId]);
+  else { add(S.stories[c.storyId]); if (speakerId && speakerId !== 'narrator') add(S.characters[speakerId]); }
+  return set;
+}
+function activeInstructions(c, speakerId) {
+  const model = c.model || S.settings.model, inh = inheritedInstr(c, speakerId), mine = new Set(c.instrIds || []), out = [];
+  for (const d of Object.values(S.instructions).sort((a, b) => a.createdAt - b.createdAt)) {
+    if (!d.enabled || !d.content.trim()) continue;
+    const on = d.scope === 'global' || (d.scope === 'models' && matchModel(model, d.models)) || (d.scope === 'attached' && (inh.has(d.id) || mine.has(d.id)));
+    if (on) out.push({ name: d.name, content: d.content, position: d.position || 'top' });
+  }
+  for (const f of c.files || []) if (f.content.trim()) out.push({ name: f.name, content: f.content, position: f.position || 'top' });
+  return out;
+}
+const clipCount = c => (c.files || []).length + (c.instrIds || []).length;
+const clipInner = c => ic('clip') + (clipCount(c) ? `<span class="badge">${clipCount(c)}</span>` : '');
+function updateClip(c) { const b = $('#clipbtn'); if (b) b.innerHTML = clipInner(c); }
+async function readTextFile(f) {
+  const text = await f.text();
+  if (text.length > 60000 && !confirm(`This file is about ${est(text).toLocaleString()} tokens and will be sent with every reply. Attach it anyway?`)) return null;
+  return text;
+}
+const MD_ACCEPT = '.md,.markdown,.txt,text/markdown,text/plain';
+
+function instrSheet(id) {
+  const c = S.chats[id], model = c.model || S.settings.model;
+  const docs = Object.values(S.instructions).filter(d => d.enabled).sort((a, b) => a.createdAt - b.createdAt);
+  const auto = docs.filter(d => d.scope === 'global' || (d.scope === 'models' && matchModel(model, d.models)));
+  const inh = new Set(); (c.type === 'char' ? [S.characters[c.charId]] : [S.stories[c.storyId], ...(c.characterIds || []).map(i => S.characters[i])]).forEach(o => (o?.instrIds || []).forEach(i => inh.add(i)));
+  const attachable = docs.filter(d => d.scope === 'attached');
+  const total = activeInstructions(c, c.type === 'char' ? c.charId : null).reduce((n, x) => n + est(x.content), 0);
+  modal(`<h3>Instructions</h3><p class="sm muted">Sent to the model with every reply in this chat.</p>
+    ${auto.length ? `<div class="fld"><span>Automatic</span>${auto.map(d => `<div class="pickrow">${ic('doc', 16)}<span>${esc(d.name)} <small style="display:inline">· ${d.scope === 'global' ? 'every chat' : 'matches this model'}</small></span></div>`).join('')}</div>` : ''}
+    ${attachable.length ? `<div class="fld"><span>From your library</span>${attachable.map(d => `<label class="pickrow"><input type="checkbox" ${inh.has(d.id) ? 'checked disabled' : (c.instrIds || []).includes(d.id) ? 'checked' : ''} onchange="toggleChatInstr('${id}','${d.id}',this.checked)"><span>${esc(d.name)}${inh.has(d.id) ? ' <small style="display:inline">· via character/story</small>' : ''}</span></label>`).join('')}</div>` : ''}
+    <div class="fld"><span>Files in this chat</span>${(c.files || []).map(f => `<div class="pickrow">${ic('doc', 16)}<span style="flex:1;min-width:0">${esc(f.name)} <small style="display:inline">· ~${est(f.content).toLocaleString()} tokens${f.position === 'bottom' ? ' · before reply' : ''}</small></span><button class="icon" onclick="editChatFile('${id}','${f.id}')" aria-label="Edit">${ic('edit', 16)}</button><button class="icon" onclick="removeChatFile('${id}','${f.id}')" aria-label="Remove">${ic('trash', 16)}</button></div>`).join('') || '<small>None yet.</small>'}</div>
+    <div class="btns"><button class="btn" onclick="attachChatFile('${id}')">${ic('clip', 16)} Attach .md file</button><button class="btn ghost" onclick="editChatFile('${id}','')">Write a note</button></div>
+    <p class="sm muted">Total ≈ ${total.toLocaleString()} tokens per reply. Reusable instructions live in Settings → Instructions.</p>`);
+}
+async function toggleChatInstr(id, did, on) {
+  const c = S.chats[id]; c.instrIds = (c.instrIds || []).filter(x => x !== did); if (on) c.instrIds.push(did);
+  await save('chats', c); updateClip(c);
+}
+async function attachChatFile(id) {
+  const f = await pickFile(MD_ACCEPT); if (!f) return;
+  const text = await readTextFile(f); if (text == null) return;
+  const c = S.chats[id]; c.files = c.files || []; c.files.push({ id: uid(), name: f.name, content: text, position: 'top' });
+  await save('chats', c); updateClip(c); instrSheet(id); toast('Attached');
+}
+async function removeChatFile(id, fid) {
+  const c = S.chats[id]; const f = (c.files || []).find(x => x.id === fid);
+  if (!f || !confirm(`Remove ${f.name} from this chat?`)) return;
+  c.files = c.files.filter(x => x.id !== fid); await save('chats', c); updateClip(c); instrSheet(id);
+}
+function editChatFile(id, fid) {
+  const c = S.chats[id], f = (c.files || []).find(x => x.id === fid) || { name: 'Note', content: '', position: 'top' };
+  modal(`<h3>${fid ? 'Edit' : 'New note'}</h3><label class="fld"><span>Name</span><input id="cfname" value="${esc(f.name)}"></label>
+    <label class="fld"><span>Instructions</span><textarea id="cftext" class="mono" rows="10" placeholder="e.g. Keep replies under 150 words. Write in second person.">${esc(f.content)}</textarea></label>
+    <label class="fld"><span>Placement</span><select id="cfpos"><option value="top" ${f.position !== 'bottom' ? 'selected' : ''}>System prompt (top)</option><option value="bottom" ${f.position === 'bottom' ? 'selected' : ''}>Right before each reply (stronger)</option></select></label>
+    <div class="btns"><button class="btn ghost" onclick="instrSheet('${id}')">Back</button><button class="btn" onclick="saveChatFile('${id}','${fid}')">Save</button></div>`);
+}
+async function saveChatFile(id, fid) {
+  const c = S.chats[id]; c.files = c.files || [];
+  const val = { name: $('#cfname').value.trim() || 'Note', content: $('#cftext').value, position: $('#cfpos').value };
+  if (!val.content.trim()) return toast('Write something first');
+  const f = c.files.find(x => x.id === fid);
+  if (f) Object.assign(f, val); else c.files.push({ id: uid(), ...val });
+  await save('chats', c); updateClip(c); instrSheet(id);
+}
+function viewInstrEdit(id) {
+  if (!draft || draft._for !== id) {
+    const src = id === 'new' ? newInstr() : structuredClone(S.instructions[id]);
+    if (!src) return go('#/settings');
+    draft = src; draft._for = id;
+  }
+  const d = draft;
+  shell({
+    title: id === 'new' ? 'New instructions' : 'Edit instructions', back: "cancelEdit('#/settings')", nav: false,
+    actions: `<button class="btn sm" onclick="saveInstr()">Save</button>`,
+    body: `<div class="form">
+      ${field('Name', 'name', d.name, { req: 1, ph: 'e.g. House style, DeepSeek fixes' })}
+      <div class="btns" style="margin-top:-6px"><button class="btn ghost sm" onclick="loadInstrFile()">${ic('doc', 14)} Load from .md file</button></div>
+      <label class="fld"><span>Instructions (Markdown)</span><textarea data-k="content" class="mono" rows="14" placeholder="Rules the model should follow, e.g. formatting, length, tone, things to avoid…" oninput="$('#itok').textContent='~'+est(this.value).toLocaleString()+' tokens, sent with every reply it applies to'">${esc(d.content)}</textarea><small id="itok">~${est(d.content).toLocaleString()} tokens, sent with every reply it applies to</small></label>
+      <div class="fld"><span>Applies to</span>${[['global', 'Every chat'], ['models', 'Chats using matching models'], ['attached', 'Only where attached (characters, stories, chats)']].map(([v, l]) => `<label class="pickrow"><input type="radio" name="scope" data-k="scope" value="${v}" ${d.scope === v ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--accent)"><span>${l}</span></label>`).join('')}</div>
+      ${field('Model patterns', 'models', d.models, { ph: 'deepseek, mistralai/*', hint: 'Only used for "matching models". Comma separated. A plain word matches any model ID containing it; * is a wildcard.' })}
+      <label class="fld"><span>Placement</span><select data-k="position"><option value="top" ${d.position !== 'bottom' ? 'selected' : ''}>System prompt (top)</option><option value="bottom" ${d.position === 'bottom' ? 'selected' : ''}>Right before each reply (stronger)</option></select><small>"Before each reply" is better for style and format rules that models drift away from in long chats.</small></label>
+      <label class="pickrow"><input type="checkbox" data-k="enabled" ${d.enabled ? 'checked' : ''}><span>Enabled</span></label>
+      ${id !== 'new' ? `<div style="margin-top:20px"><button class="btn danger" onclick="deleteInstr('${id}')">Delete</button></div>` : ''}
+    </div>`
+  });
+}
+async function loadInstrFile() {
+  readForm(draft); const f = await pickFile(MD_ACCEPT); if (!f) return;
+  const text = await readTextFile(f); if (text == null) return;
+  if (draft.content.trim() && !confirm('Replace the current text with this file?')) return;
+  draft.content = text; if (!draft.name.trim()) draft.name = f.name.replace(/\.(md|markdown|txt)$/i, '');
+  viewInstrEdit(draft._for);
+}
+async function importInstrFile() {
+  const f = await pickFile(MD_ACCEPT); if (!f) return;
+  const text = await readTextFile(f); if (text == null) return;
+  draft = Object.assign(newInstr(), { name: f.name.replace(/\.(md|markdown|txt)$/i, ''), content: text }); draft._for = 'new';
+  go('#/instr/new'); toast('Choose where it applies, then save', 3000);
+}
+async function saveInstr() {
+  readForm(draft); const d = draft;
+  if (!d.name.trim()) return toast('Name is required');
+  if (!d.content.trim()) return toast('Instructions are empty');
+  if (d.scope === 'models' && !splitTags(d.models).length) return toast('Add at least one model pattern');
+  const o = { ...d }; delete o._for;
+  await save('instructions', o); draft = null; toast('Saved'); go('#/settings');
+}
+async function deleteInstr(id) { if (!confirm('Delete these instructions?')) return; await remove('instructions', id); draft = null; go('#/settings'); }
+
+/* ================= AI builder ================= */
+let aiCtrl = null;
+const BUILDER_RULES = `Honor the user's requested genre, tone and themes, and write original material. ${ADULT_RULE} Any "age" field must be an integer of 18 or more. Return ONLY one JSON object: no commentary, no markdown, no code fences.`;
+const CHAR_SCHEMA = `{
+  "name": "full name",
+  "age": 25,
+  "tagline": "one-line hook for the character card",
+  "description": "appearance, background and situation in 2-4 paragraphs; call the user's character {{user}}",
+  "personality": "core traits, quirks, desires and speech style",
+  "scenario": "the situation when a chat begins",
+  "greetings": ["opening message in the character's voice: *actions* in asterisks, \\"dialogue\\" in quotes; never act or speak for {{user}}"],
+  "examples": "2-4 short exchanges formatted as {{user}}: ...\\n{{char}}: ...",
+  "tags": ["3-6 short lowercase tags"]
+}`;
+const STORY_SCHEMA = `{
+  "title": "story title",
+  "premise": "the world, situation and stakes in 1-3 paragraphs; call the user's character {{user}}",
+  "opening": "the opening scene, ending at a moment where {{user}} can act; never act or speak for {{user}}",
+  "narratorNotes": "narration style: point of view, tense, pacing, tone",
+  "tags": ["3-6 short lowercase tags"],
+  "newCharacters": []
+}`;
+const aiStr = v => typeof v === 'string' ? v.trim() : Array.isArray(v) ? v.map(aiStr).join('\n') : v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+function parseJSON(t) {
+  const s = String(t).replace(/<think>[\s\S]*?<\/think>/gi, '').replace(/```(?:json)?/gi, '');
+  const a = s.indexOf('{'), b = s.lastIndexOf('}');
+  if (a < 0 || b < a) throw new Error('The model did not return JSON. Try again, or set a different builder model in Settings.');
+  try { return JSON.parse(s.slice(a, b + 1)); }
+  catch (e) { throw new Error('The model returned broken JSON (often cut off). Try again, or use a different builder model.'); }
+}
+const isMinorAge = v => v !== undefined && v !== null && String(v).trim() !== '' && !isNaN(parseInt(v, 10)) && parseInt(v, 10) < 18;
+const MINOR_MSG = 'The model wrote a character under 18, so the result was discarded. Try again with an adult character.';
+function normChar(o) {
+  const r = {};
+  for (const k of ['name', 'tagline', 'description', 'personality', 'scenario', 'examples']) if (k in o) r[k] = aiStr(o[k]);
+  if ('greetings' in o) r.greetings = (Array.isArray(o.greetings) ? o.greetings : [o.greetings]).map(aiStr).filter(Boolean);
+  if ('tags' in o) r.tags = (Array.isArray(o.tags) ? o.tags : splitTags(o.tags)).map(t => aiStr(t)).filter(Boolean).slice(0, 8);
+  if ('age' in o) { const a = parseInt(o.age, 10); r.age = a >= 18 ? a : ''; }
+  return r;
+}
+function normStory(o) {
+  const r = {};
+  for (const k of ['title', 'premise', 'opening', 'narratorNotes']) if (k in o) r[k] = aiStr(o[k]);
+  if ('tags' in o) r.tags = (Array.isArray(o.tags) ? o.tags : splitTags(o.tags)).map(t => aiStr(t)).filter(Boolean).slice(0, 8);
+  return r;
+}
+async function aiRun(messages, statusEl) {
+  if (!ready()) throw new Error('setup');
+  aiCtrl = new AbortController(); let out = '';
+  try {
+    await streamChat(messages, aiCtrl.signal, d => { out += d; if (statusEl && statusEl.isConnected) statusEl.textContent = `Writing… ${out.length.toLocaleString()} characters`; }, { model: S.settings.builderModel || S.settings.model, maxTokens: 3000 });
+  } finally { aiCtrl = null; }
+  return parseJSON(out);
+}
+function aiBusy(on) {
+  const b = $('#bgo'); if (b) { b.dataset.l = b.dataset.l || b.textContent; b.disabled = on; b.textContent = on ? 'Working…' : b.dataset.l; }
+  const c = $('#bcancel'); if (c) c.style.display = on ? '' : 'none';
+}
+function aiCancel() { aiCtrl?.abort(); }
+function aiFail(e) {
+  if (e.message === 'setup') return;
+  const msg = e.name === 'AbortError' ? 'Cancelled.' : e.message, s = $('#bstat');
+  if (s) s.textContent = msg; else toast(msg, 5000);
+}
+const builderModelName = () => esc(S.settings.builderModel || S.settings.model || 'your default model');
+function builderButtons(fn, label) { return `<div class="sm muted" id="bstat" style="margin-top:8px">Uses ${builderModelName()}.</div><div class="btns"><button class="btn" id="bgo" onclick="${fn}()">${label}</button><button class="btn ghost" id="bcancel" style="display:none" onclick="aiCancel()">Cancel</button></div>`; }
+function aiBar(d, kind) {
+  if (!d._changed) return '';
+  return `<div class="banner" style="cursor:default"><b>${ic('spark', 14)} AI changed: ${d._changed.map(esc).join(', ')}</b><div class="btns" style="margin:6px 0 0"><button class="btn ghost sm" onclick="undoAI('${kind}')">Undo</button><button class="btn ghost sm" onclick="keepAI('${kind}')">Keep</button></div></div>`;
+}
+const aiSync = kind => kind === 'char' ? syncChar() : syncStory();
+const aiRerender = kind => kind === 'char' ? viewCharEdit(draft._for) : viewStoryEdit(draft._for);
+function undoAI(kind) { const u = draft._undo; if (!u) return; draft = u; draft._undo = null; draft._changed = null; aiRerender(kind); toast('Undone'); }
+function keepAI(kind) { aiSync(kind); draft._undo = null; draft._changed = null; aiRerender(kind); }
+function applyPatch(kind, patch, cur) {
+  const keys = Object.keys(patch).filter(k => JSON.stringify(patch[k]) !== JSON.stringify(cur[k]));
+  if (!keys.length) return false;
+  const snap = structuredClone({ ...draft, _undo: null, _changed: null });
+  for (const k of keys) draft[k] = patch[k];
+  if (keys.includes('tags')) draft.tagsStr = draft.tags.join(', ');
+  if (keys.includes('greetings') && !draft.greetings.length) draft.greetings = [''];
+  draft._undo = snap; draft._changed = keys;
+  closeModal(); aiRerender(kind); $('#view').scrollTop = 0;
+  return true;
+}
+function quickChips(list) { return `<div class="btns">${list.map(s => `<button class="chip" style="padding:5px 11px" onclick="$('#bidea').value=this.textContent">${s}</button>`).join('')}</div>`; }
+
+function charBuilder() {
+  modal(`<h3>${ic('spark', 18)} Build a character</h3><p class="sm muted">Describe the idea. The AI drafts every field, then you review and edit before saving.</p>
+    <textarea id="bidea" rows="6" placeholder="Who they are, where they live, how they talk, their dynamic with you, genre and tone…"></textarea>
+    <div class="two" style="margin-top:10px"><label class="fld"><span>Greetings</span><select id="bgreet"><option>1</option><option selected>2</option><option>3</option></select></label><label class="fld"><span>Detail</span><select id="bdetail"><option value="concise">Concise</option><option value="rich" selected>Rich</option></select></label></div>
+    ${builderButtons('runCharBuilder', 'Generate')}`);
+}
+async function runCharBuilder() {
+  const idea = $('#bidea').value.trim(); if (!idea) return toast('Describe the character first');
+  const n = $('#bgreet').value, detail = $('#bdetail').value;
+  aiBusy(true);
+  try {
+    const o = await aiRun([
+      { role: 'system', content: `You are a character designer for an interactive roleplay app. ${BUILDER_RULES}` },
+      { role: 'user', content: `Create a character from this idea:\n${idea}\n\nWrite exactly ${n} greeting(s). Detail level: ${detail}.\nUse exactly this JSON format:\n${CHAR_SCHEMA}` }], $('#bstat'));
+    if (isMinorAge(o.age)) throw new Error(MINOR_MSG);
+    const c = Object.assign(newCharacter(), normChar(o));
+    if (!c.greetings.length) c.greetings = [''];
+    draft = c; draft._for = 'new'; go('#/char/new');
+    toast(c.age ? 'Draft ready. Review it, then save.' : 'Draft ready. Set an age (18+), then save.', 3500);
+  } catch (e) { aiFail(e); aiBusy(false); }
+}
+function charFields(d) {
+  return { name: d.name, age: d.age, tagline: d.tagline, description: d.description, personality: d.personality, scenario: d.scenario,
+    greetings: (d.greetings || []).filter(g => g.trim()), examples: d.examples, tags: splitTags(d.tagsStr ?? (d.tags || []).join(',')) };
+}
+function charAssist() {
+  syncChar();
+  modal(`<h3>${ic('spark', 18)} AI assist</h3><p class="sm muted">Say what to change. You can undo it afterwards. Unsaved edits are included.</p>
+    ${quickChips(['Write 2 more alternate greetings', 'Expand the description', 'Make the personality more distinctive', 'Write example dialogue', 'Fill in any empty fields'])}
+    <textarea id="bidea" rows="4" placeholder="e.g. Give them a secret and a sharper sense of humor"></textarea>
+    ${builderButtons('runCharAssist', 'Apply')}`);
+}
+async function runCharAssist() {
+  const want = $('#bidea').value.trim(); if (!want) return toast('Say what to change');
+  const cur = charFields(draft);
+  aiBusy(true);
+  try {
+    const o = await aiRun([
+      { role: 'system', content: `You are a character designer for an interactive roleplay app, editing an existing character. ${BUILDER_RULES}` },
+      { role: 'user', content: `Current character:\n${JSON.stringify(cur, null, 2)}\n\nChange request: ${want}\n\nReturn a JSON object containing ONLY the fields you changed, using the same field names. If you change greetings, return the complete updated array. Field format reference:\n${CHAR_SCHEMA}` }], $('#bstat'));
+    if (isMinorAge(o.age)) throw new Error(MINOR_MSG);
+    if (!applyPatch('char', normChar(o), cur)) { $('#bstat').textContent = 'No changes came back. Try rewording.'; aiBusy(false); }
+  } catch (e) { aiFail(e); aiBusy(false); }
+}
+function storyBuilder() {
+  const chars = Object.values(S.characters).sort((a, b) => a.name.localeCompare(b.name));
+  modal(`<h3>${ic('spark', 18)} Build a story</h3><p class="sm muted">Describe the scenario. Use existing characters, let the AI invent new ones, or both. You review everything before saving.</p>
+    <textarea id="bidea" rows="6" placeholder="Setting, situation, stakes, genre, tone, and who you are in it…"></textarea>
+    ${chars.length ? `<div class="fld" style="margin-top:10px"><span>Existing characters in the cast</span>${chars.map(c => `<label class="pickrow"><input type="checkbox" data-bcast="${c.id}">${avatar(c.avatar, c.name, 28)}<span>${esc(c.name)}</span></label>`).join('')}</div>` : ''}
+    <div class="two" style="margin-top:10px"><label class="fld"><span>New characters to invent</span><select id="bnew">${[0, 1, 2, 3].map(n => `<option ${n === (chars.length ? 0 : 2) ? 'selected' : ''}>${n}</option>`).join('')}</select></label><label class="fld"><span>Narrator</span><select id="bnarr"><option value="yes">On</option><option value="no">Off</option></select></label></div>
+    ${builderButtons('runStoryBuilder', 'Generate')}`);
+}
+async function runStoryBuilder() {
+  const idea = $('#bidea').value.trim(); if (!idea) return toast('Describe the story first');
+  const castIds = $$('[data-bcast]:checked').map(e => e.dataset.bcast), nNew = Number($('#bnew').value), narr = $('#bnarr').value === 'yes';
+  if (castIds.length + nNew > 5) return toast('The cast is limited to 5 characters');
+  if (!castIds.length && !nNew && !narr) return toast('Pick a cast, invent characters, or turn on the narrator');
+  const castInfo = castIds.map(id => { const c = S.characters[id]; return `- ${c.name}: ${(c.tagline || c.description || '').slice(0, 300)}`; }).join('\n');
+  aiBusy(true);
+  try {
+    const o = await aiRun([
+      { role: 'system', content: `You are a story designer for an interactive roleplay app. ${BUILDER_RULES}` },
+      { role: 'user', content: `Create a story scenario from this idea:\n${idea}\n\n${castInfo ? `Existing cast to include (do not redefine them, just use them):\n${castInfo}\n\n` : ''}${nNew ? `Invent exactly ${nNew} new character(s) and put them in "newCharacters", each as an object in this format:\n${CHAR_SCHEMA}\n\n` : 'Leave "newCharacters" as an empty array.\n\n'}${narr ? 'A narrator delivers the opening scene.' : 'There is no narrator: write the opening as a plain scene description.'}\n\nUse exactly this JSON format:\n${STORY_SCHEMA}` }], $('#bstat'));
+    const s = Object.assign(newStory(), normStory(o)); s.narrator = narr;
+    const raw = Array.isArray(o.newCharacters) ? o.newCharacters : [];
+    const dropped = raw.filter(x => isMinorAge(x?.age)).length;
+    const newChars = raw.filter(x => !isMinorAge(x?.age)).slice(0, 5 - castIds.length).map(x => {
+      const c = Object.assign(newCharacter(), normChar(x || {})); if (!c.greetings.length) c.greetings = ['']; if (!c.name) c.name = 'Unnamed'; return c; });
+    s.characterIds = [...castIds, ...newChars.map(c => c.id)];
+    draft = s; draft._for = 'new'; draft._newChars = newChars; go('#/story/new');
+    toast((newChars.length ? `Draft ready with ${newChars.length} new character(s). Review, then save.` : 'Draft ready. Review it, then save.') + (dropped ? ` ${dropped} under-18 character(s) the model wrote were discarded.` : ''), 4500);
+  } catch (e) { aiFail(e); aiBusy(false); }
+}
+function storyAssist() {
+  syncStory();
+  modal(`<h3>${ic('spark', 18)} AI assist</h3><p class="sm muted">Say what to change in the story. You can undo it afterwards.</p>
+    ${quickChips(['Raise the stakes', 'Rewrite the opening with more tension', 'Expand the setting', 'Suggest a narration style'])}
+    <textarea id="bidea" rows="4" placeholder="e.g. Move it to a snowed-in mountain lodge"></textarea>
+    ${builderButtons('runStoryAssist', 'Apply')}`);
+}
+async function runStoryAssist() {
+  const want = $('#bidea').value.trim(); if (!want) return toast('Say what to change');
+  const d = draft, cur = { title: d.title, premise: d.premise, opening: d.opening, narratorNotes: d.narratorNotes, tags: splitTags(d.tagsStr ?? (d.tags || []).join(',')) };
+  const cast = [...Object.values(S.characters), ...(d._newChars || [])].filter(c => (d.characterIds || []).includes(c.id)).map(c => `- ${c.name}: ${(c.tagline || '').slice(0, 200)}`).join('\n');
+  aiBusy(true);
+  try {
+    const o = await aiRun([
+      { role: 'system', content: `You are a story designer for an interactive roleplay app, editing an existing scenario. ${BUILDER_RULES}` },
+      { role: 'user', content: `Current story:\n${JSON.stringify(cur, null, 2)}\n${cast ? `\nCast:\n${cast}\n` : ''}\nChange request: ${want}\n\nReturn a JSON object containing ONLY the fields you changed (title, premise, opening, narratorNotes, tags).` }], $('#bstat'));
+    if (!applyPatch('story', normStory(o), cur)) { $('#bstat').textContent = 'No changes came back. Try rewording.'; aiBusy(false); }
+  } catch (e) { aiFail(e); aiBusy(false); }
+}
+
+/* ================= Settings ================= */
+function num(label, key, val, min, max, step, hint = '') {
+  return `<label class="fld"><span>${label}</span><input type="number" inputmode="decimal" value="${esc(val)}" min="${min}" max="${max}" step="${step}" onchange="setS('${key}', Number(this.value))">${hint ? `<small>${hint}</small>` : ''}</label>`;
+}
+function viewSettings() {
+  const st = S.settings, ps = Object.values(S.personas);
+  shell({
+    title: 'Settings',
+    body: `<div class="form">
+    <div class="section"><h2>OpenRouter</h2>
+      <label class="fld"><span>API key</span><div class="inrow"><input id="key" type="password" autocomplete="off" value="${esc(st.apiKey)}" placeholder="sk-or-…" onchange="setS('apiKey', this.value.trim())"><button class="btn ghost sm" onclick="const k=$('#key');k.type=k.type==='password'?'text':'password'">Show</button></div>
+        <small>Stored only in this browser and never included in backups. Get one at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.</small></label>
+      <div class="fld"><span>Default model</span><button class="pick" onclick="modelPicker(m => { setS('model', m); viewSettings(); })">${esc(st.model || 'Choose a model…')}</button></div>
+      <div class="fld"><span>Builder model</span><button class="pick" onclick="modelPicker(m => { setS('builderModel', m); viewSettings(); })">${esc(st.builderModel || 'Same as default model')}</button><small>Used by the AI character & story builder. Pick one that follows JSON instructions reliably.${st.builderModel ? ` <a href="#" onclick="event.preventDefault();setS('builderModel','');viewSettings()">Use default</a>` : ''}</small></div>
+      <div class="two">${num('Temperature', 'temperature', st.temperature, 0, 2, 0.05)}${num('Max reply tokens', 'maxTokens', st.maxTokens, 50, 8000, 10)}</div>
+      ${num('Context budget (tokens)', 'contextTokens', st.contextTokens, 2000, 2000000, 1000, 'How much prompt + history to send each turn. Higher remembers more but costs more per message. Keep it under the model\'s context size.')}
+    </div>
+    <div class="section"><h2>Personas <span class="muted sm">· who you play</span></h2>
+      ${ps.map(p => `<div class="row" onclick="edit('#/persona/${p.id}')">${avatar(p.avatar, p.name, 40)}<div class="rowmain"><b>${esc(p.name)}</b>${st.defaultPersonaId === p.id ? ' <span class="tag">default</span>' : ''}<div class="muted sm clamp1">${esc(p.description || '')}</div></div></div>`).join('')}
+      <button class="btn ghost sm" onclick="edit('#/persona/new')">${ic('plus', 14)} Add persona</button>
+    </div>
+    <div class="section"><h2>Instructions <span class="muted sm">· .md files sent to the model</span></h2>
+      ${Object.values(S.instructions).sort((a, b) => a.createdAt - b.createdAt).map(d => `<div class="row" onclick="edit('#/instr/${d.id}')"><div class="av ph" style="width:40px;height:40px">${ic('doc', 18)}</div><div class="rowmain"><b>${esc(d.name)}</b>${d.enabled ? '' : ' <span class="tag">off</span>'}<div class="muted sm clamp1">${esc(scopeLabel(d))} · ~${est(d.content).toLocaleString()} tokens</div></div></div>`).join('') || '<p class="sm muted">None yet. Use these for writing-style rules, formatting, or model-specific fixes.</p>'}
+      <div class="btns"><button class="btn ghost sm" onclick="edit('#/instr/new')">${ic('plus', 14)} New</button><button class="btn ghost sm" onclick="importInstrFile()">${ic('doc', 14)} Import .md</button></div>
+    </div>
+    <div class="section"><h2>Prompts</h2>
+      <label class="fld"><span>Character system prompt</span><textarea rows="7" onchange="setS('systemTemplate', this.value)">${esc(st.systemTemplate)}</textarea></label>
+      <label class="fld"><span>Narrator system prompt</span><textarea rows="6" onchange="setS('narratorTemplate', this.value)">${esc(st.narratorTemplate)}</textarea><small>{{char}} and {{user}} are replaced automatically. An adults-only line is always added.</small></label>
+      <button class="btn ghost sm" onclick="resetPrompts()">Reset to defaults</button>
+    </div>
+    <div class="section"><h2>Data</h2>
+      <p class="sm muted" id="storinfo">Everything lives on this device. Export a backup regularly; Safari can clear data for web apps that aren't on your home screen.</p>
+      <div class="btns"><button class="btn ghost" onclick="exportBackup()">Export backup</button><button class="btn ghost" onclick="importBackup()">Import backup</button></div>
+      <button class="btn danger sm" onclick="wipeAll()">Delete all data</button>
+    </div>
+    <p class="center sm muted">Lucid v2</p></div>`
+  });
+  storageInfo();
+}
+async function storageInfo() {
+  try {
+    const persisted = await navigator.storage?.persisted?.();
+    const e = await navigator.storage?.estimate?.();
+    const el = $('#storinfo');
+    if (el && e) el.textContent += ` Using ${(e.usage / 1048576).toFixed(1)} MB.${persisted ? ' Storage is marked persistent.' : ''}`;
+  } catch (err) {}
+}
+function resetPrompts() { if (!confirm('Reset both prompts to the defaults?')) return; S.settings.systemTemplate = DEFAULT_SYSTEM; S.settings.narratorTemplate = DEFAULT_NARRATOR; saveSettings(); viewSettings(); toast('Prompts reset'); }
+function exportBackup() {
+  const { apiKey, models, modelsFetched, ...settings } = S.settings;
+  const data = { app: 'lucid', version: 1, exported: new Date().toISOString(), settings,
+    ...Object.fromEntries(DATA_STORES.map(s => [s, Object.values(S[s])])) };
+  download(`lucid-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(data));
+}
+async function importBackup() {
+  const f = await pickFile('.json,application/json'); if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (data.app !== 'lucid') throw new Error('Not a Lucid backup');
+    if (!confirm('Merge this backup into your current data? Items with the same ID are overwritten.')) return;
+    for (const s of DATA_STORES) for (const o of data[s] || []) { S[s][o.id] = o; await DB.put(s, o); }
+    if (data.settings) { const { apiKey, ...rest } = data.settings; Object.assign(S.settings, rest); await saveSettings(); }
+    toast('Backup imported'); render();
+  } catch (e) { toast('Import failed: ' + e.message, 4000); }
+}
+async function wipeAll() {
+  if (!confirm('Delete ALL characters, stories, chats, World Books, personas and settings on this device?')) return;
+  if (!confirm('This cannot be undone. Delete everything?')) return;
+  for (const s of STORES) await DB.clear(s);
+  location.hash = '#/chats'; location.reload();
+}
+
+/* ================= Boot ================= */
+function fitViewport() {
+  const vv = window.visualViewport; if (!vv) return;
+  const f = () => { document.documentElement.style.setProperty('--app-h', vv.height + 'px'); document.documentElement.style.setProperty('--app-top', vv.offsetTop + 'px'); if (route().a === 'chat') scrollBottom(); };
+  vv.addEventListener('resize', f); vv.addEventListener('scroll', f); f();
+}
+function makeIcon() {
+  const c = document.createElement('canvas'); c.width = c.height = 180; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 180, 180); g.addColorStop(0, '#a78bfa'); g.addColorStop(1, '#f472b6');
+  x.fillStyle = '#0b0c17'; x.fillRect(0, 0, 180, 180);
+  x.fillStyle = g; x.beginPath(); x.arc(90, 90, 58, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#0b0c17'; x.beginPath(); x.arc(112, 74, 52, 0, Math.PI * 2); x.fill();
+  const url = c.toDataURL('image/png'); $('#touchicon').href = url; $('#favicon').href = url;
+}
+window.addEventListener('hashchange', render);
+window.addEventListener('error', e => toast('Error: ' + (e.message || 'unknown'), 4000));
+window.addEventListener('unhandledrejection', e => toast('Error: ' + (e.reason?.message || e.reason || 'unknown'), 4000));
+(async function boot() {
+  makeIcon(); buildNav(); fitViewport();
+  try { await openDB(); await loadAll(); }
+  catch (e) { $('#view').innerHTML = empty('Storage unavailable', 'This browser blocked on-device storage (private browsing?). Open Lucid in a normal tab.'); return; }
+  try { await navigator.storage?.persist?.(); } catch (e) {}
+  render();
+})();
+</script>
+</body>
+</html>
